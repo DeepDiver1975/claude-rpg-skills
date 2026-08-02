@@ -10,20 +10,39 @@ player group: pregenerated level 1 characters as filled official PDF sheets
 (with portraits) plus Markdown, a linear scenario with GM notes, NPC/monster
 Markdown stat blocks, and a consistent set of image prompts. The GM plays
 this in German; every deliverable this skill writes for players/GM must be
-German, with three exceptions: this document and all `references/*` stay
-English; class/species/skill names and PDF field labels stay in their
-original English SRD form even inside German text; and the image prompts
-written in Step 8 stay English (image-generation tools expect English
-prompts), each one labeled with the German name/scene it belongs to.
+German — that includes class/species/background names, weapon/armor/gear
+names, damage types, and skill names appearing in prose (Markdown sheets,
+the GM guide, NPC blocks), not just narrative text. Use
+`references/german-terminology.md` for the German term to use; it isn't a
+rules source (mechanics still come from the English `references/*` files
+below), just the vocabulary to write mechanics in. A short, specific list
+of things stay in their literal English SRD form, each for a concrete
+mechanical or sourcing reason spelled out in full where it matters (Step 5):
+the Character JSON schema's `skill_proficiencies`/`skill_expertise`/
+`saving_throw_proficiencies` entries (the script looks these up by exact
+name) and its `subclass` value (no verified German subclass terminology
+exists yet — a deliberate scope gap, not a rule); the official PDF's own
+printed field labels, baked into its artwork and not something this skill
+writes; and the image prompts written in Step 8 (image-generation tools
+expect English prompts), each one labeled with the German name/scene it
+belongs to. This document and all `references/*` also stay English.
 
-**In-fiction naming stays independent of document language.** Unlike a
-single-setting game, D&D has no one canonical world — default to a generic
-Western-fantasy naming convention (matching the SRD's own generic tone)
-unless the GM's premise from Step 1 establishes a specific in-fiction
-culture or setting, in which case follow that instead. When picking a name
-in Steps 3, 5, and 7, ask: "does this character/place have an explicit,
-stated reason to carry a name from a specific real-world-inspired culture?"
-If not, default to the generic-fantasy convention.
+**In-fiction naming defaults to German, not English.** This is the opposite
+default from the Cyberpunk RED skill, deliberately: Night City is a real,
+canonically English-speaking setting, so CPR's PC handles/NPC names default
+to English. D&D's homebrew fantasy world has no such real-world anchor, so
+absent a stated reason otherwise, names should follow the table's own
+language — a German-speaking table's PCs, NPCs, places, and factions
+default to German or German-flavored fantasy names (e.g. "Roland
+Wolfsbach", "Talgrund", "Die Graue Klinge"), not English ones. Deviate only
+when the GM's premise from Step 1 establishes a specific in-fiction culture
+that justifies a different naming convention for a particular
+character/place (a coastal trade-city NPC could plausibly carry a
+Mediterranean-flavored name if the premise sets up that region, for
+instance) — never default to English just because SRD reference material
+happens to be in English. When picking a name in Steps 3, 5, and 7, ask:
+"does this character/place have an explicit, stated reason to carry a name
+from a different culture?" If not, default to German.
 
 ## Step 1: Get the premise from the GM
 
@@ -100,14 +119,36 @@ All keys required except `alignment` (optional flavor — 2024 rules
 de-emphasize it), `spellcasting` (`null` for non-casters), and
 `portrait_image_path`.
 
+**Which fields stay English and which are German**: only
+`saving_throw_proficiencies`, `skill_proficiencies`, and `skill_expertise`
+must stay the SRD's literal English terms — `fill_character_sheet.py`
+looks these up by exact name (`skills_field_map.json`, `SKILL_ABILITY`), so
+translating them breaks the script. `class`, `species`, and `background`
+are, perhaps surprisingly, **not** looked up anywhere in the script — it
+writes them straight into `ClassLevel`/`Race `/`Background` with zero
+parsing — so there's no mechanical reason to keep them English, and they
+should be the German term from `references/german-terminology.md` (e.g.
+"Kämpfer", "Zwerg", "Soldat"), matching what actually ends up on the PDF
+and Markdown sheet. `subclass` is the one exception left in English: this
+skill's own glossary only covers class/species/background/skill terms, not
+the 12 SRD subclass names (Champion, Evoker, etc.) — inventing German
+subclass names without a verified source would be exactly the kind of
+unconfirmed guess `references/*` elsewhere goes out of its way to avoid, so
+leave `subclass` as the SRD's English term for now (a Step 10-style gap,
+worth fixing once verified German subclass terminology is sourced).
+`weapons[].name`/`.properties`/`.mastery`/`.damage_type`, `armor.name`,
+`equipment[]`, and `features_and_traits[]` are pure display text the
+script never parses either, so write those in German too. The example
+below shows all of this together:
+
 ```json
 {
   "name": "string",
-  "species": "string (one of the SRD's 9 species)",
-  "class": "string (one of the SRD's 12 classes)",
-  "subclass": "string (the SRD's single listed subclass for that class)",
+  "species": "string (German term, e.g. \"Zwerg\" — see german-terminology.md)",
+  "class": "string (German term, e.g. \"Kämpfer\")",
+  "subclass": "string (the SRD's single listed subclass, left in English — see note above)",
   "level": 1,
-  "background": "string (one of the SRD's 4 backgrounds)",
+  "background": "string (German term, e.g. \"Soldat\")",
   "alignment": "string, optional",
   "ability_scores": {"STR": 16, "DEX": 12, "CON": 14, "INT": 10, "WIS": 13, "CHA": 8},
   "proficiency_bonus": 2,
@@ -118,11 +159,11 @@ de-emphasize it), `spellcasting` (`null` for non-casters), and
   "saving_throw_proficiencies": ["STR", "CON"],
   "skill_proficiencies": ["Athletics", "Intimidation"],
   "skill_expertise": [],
-  "weapons": [{"name": "Longsword", "attack_ability": "STR", "damage_die": "1d8", "damage_type": "slashing", "properties": "Versatile (1d10)", "mastery": "Sap"}],
-  "armor": {"name": "Chain Mail", "ac_base": 16, "stealth_disadvantage": true},
-  "equipment": ["Shield", "Explorer's Pack"],
+  "weapons": [{"name": "Langschwert", "attack_ability": "STR", "damage_die": "1d8", "damage_type": "Hiebschaden", "properties": "Vielseitig (1d10)", "mastery": "Schwächen"}],
+  "armor": {"name": "Kettenrüstung", "ac_base": 16, "stealth_disadvantage": true},
+  "equipment": ["Schild", "Entdeckerausrüstung"],
   "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 10, "pp": 0},
-  "features_and_traits": ["Second Wind (1/rest, heal 1d10 + level)"],
+  "features_and_traits": ["Zweiter Atem (1×/Rast, heilt 1d10 + Stufe)"],
   "spellcasting": null,
   "personality_traits": "string",
   "ideals": "string",
@@ -140,9 +181,23 @@ de-emphasize it), `spellcasting` (`null` for non-casters), and
 {"ability": "INT", "cantrips": ["Fire Bolt", "Mage Hand"], "spells_known_or_prepared": ["Magic Missile", "Shield"], "spell_slots": {"1": 2}}
 ```
 
+Spell names stay in their English SRD form for the same reason `subclass`
+does: `references/german-terminology.md` doesn't cover them, and inventing
+German spell names without a verified source risks contradicting the
+official German translation. Treat this the same way as the `subclass`
+gap — fine to leave as-is, worth fixing once verified German spell
+terminology is sourced.
+
 `skill_proficiencies`/`skill_expertise` keys must be normalized skill names
 present in `assets/skills_field_map.json` (the 18 SRD skills) — the script
-raises an error naming any skill you use that isn't in that map.
+raises an error naming any skill you use that isn't in that map. This is
+the one place the English JSON term doesn't automatically become German
+output: the PDF's own printed skill labels are unavoidably English (see the
+next constraint below), and the **Markdown sheet's skill line should show
+the German term from `references/german-terminology.md` with the English
+SRD term in parentheses**, e.g. "Athletik (Athletics) +5" — write it that
+way explicitly, don't just copy the JSON's `"Athletics"` into the Markdown
+verbatim.
 
 **Known constraint — sheet is 2014-layout, data is 2024/SRD-5.2.1**: the
 official fillable PDF this skill uses
@@ -156,7 +211,14 @@ this is the actual PDF field name); Weapon Mastery properties have no
 dedicated column on this sheet, so they're folded into the weapon's Name
 field in parentheses instead. Both are handled automatically by
 `fill_character_sheet.py` — no action needed when writing the JSON, just be
-aware the printed PDF's field label still literally says "Race".
+aware the printed PDF's field label still literally says "RACE" in English
+(unavoidable, it's baked into the sheet's artwork) even though the value
+printed next to it — the character's `species`, per the schema above — is
+written in German (e.g. "Zwerg"), same as `class`/`background`. Only the
+field's own printed label is stuck in English; everything this skill
+actually writes into the page (species/class/background values, weapon
+names, equipment, features, backstory, personality) is German, `subclass`
+excepted per the schema note above.
 
 **Known constraint — text fields auto-shrink, they don't clip**: unlike the
 Cyberpunk RED skill's character sheet (which hard-clips overlong text),
@@ -235,10 +297,14 @@ the SRD's own monster stat-block shape:
 ```
 
 Field labels (AC, HP, CR) stay in their English abbreviation form even in
-German headings, per the language rule above. For a generic enemy type
-meant to be reused across multiple identical instances (e.g. "3× Bandit"),
-write one stat block file and note in the GM guide that it's reused —
-don't generate a separate near-identical file per instance.
+German headings, per the language rule above — but everything else in the
+block (name, size/type line, traits, action names/descriptions, damage
+types) is German, using `references/german-terminology.md` for creature
+types and damage types. NPC/monster names follow the same flipped naming
+default as Step 3/5 (German/German-flavored by default). For a generic
+enemy type meant to be reused across multiple identical instances (e.g.
+"3× Bandit"), write one stat block file and note in the GM guide that it's
+reused — don't generate a separate near-identical file per instance.
 
 For 1-2 more detailed named NPCs, add extra German prose sections on top of
 the same mechanical block: `## Motivation`, `## Geheimnis` (secret, ideally
