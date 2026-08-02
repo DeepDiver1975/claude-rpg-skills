@@ -3,10 +3,11 @@
 This guide defines five selectable visual style presets. A new step in
 SKILL.md asks the GM to pick one for the run; append that preset's Style
 Block, verbatim, to the end of every generated image prompt (portraits,
-NPCs, locations, battlemaps) in that run — never mix presets within one run.
-The Portrait-Specific and Battlemap-Specific Additions below are universal:
-they apply after any preset's base block, regardless of which one was
-picked, since they describe framing/composition, not rendering technique.
+NPCs, locations, battlemaps, the regional map) in that run — never mix
+presets within one run. The Portrait-Specific, Battlemap-Specific, and
+Map-Specific Additions below are universal: they apply after any preset's
+base block, regardless of which one was picked, since they describe
+framing/composition, not rendering technique.
 
 ## Style Presets
 
@@ -113,3 +114,30 @@ Applies regardless of which preset was selected above. Append to the chosen
 base style block for battlemaps: "top-down orthographic view, grid-friendly
 composition (assume a 1m-per-square grid), key cover/terrain elements clearly
 delineated and labeled, no character figures — environment only."
+
+## Map-Specific Additions
+
+Applies regardless of which preset was selected above. Append to the chosen
+base style block for the one regional overview map: "stylized graphic
+district/transit map of Night City in the tradition of corporate transit
+maps and gang-territory intel maps — bird's-eye/schematic angle (not a
+photorealistic aerial photo), bold labeled district and street names, clean
+iconography for key landmarks rendered as simplified pictograms rather than
+detailed illustration." Night City's real district names (Watson, Heywood,
+Westbrook, Pacifica, Santo Domingo, City Center, Northside, Combat Zone,
+Badlands) may be used to place the scenario geographically; if the
+scenario's locations don't map cleanly onto real Night City geography, keep
+the map schematic/abstract rather than inventing precise geographic claims.
+
+Label every named location that appears in the GM guide's scenes (Step 6)
+directly on the map, and connect them with a visible route or numbered
+markers matching scene order (1 = hook location, 2 = next scene, etc.) so a
+GM can trace the crew's path across the session at a glance. Mark the
+crew's starting location (Scene 1) with a distinct "you are here"-style
+icon or highlight, separate from the later scene markers.
+
+This is not a battlemap: no combat grid, no scale callout, and — unlike the
+Battlemap Addition's "no character figures — environment only" restriction
+— small stylized landmark icons, vehicle silhouettes, or gang-territory
+color overlays are welcome if they aid readability. The goal is a legible
+"where are we in Night City" reference image, not tactical accuracy.

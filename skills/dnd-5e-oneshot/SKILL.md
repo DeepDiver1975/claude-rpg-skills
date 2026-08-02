@@ -313,15 +313,23 @@ tied to a specific PC), `## Spielleitung` (GM roleplay notes), plus a
 
 ## Step 8: Generate image prompts
 
-For every PC portrait, major NPC, key location, and 1-2 battlemaps for the
-climax fight: write an English image-generation prompt appending the GM's
-selected style preset from `references/style-guide.md`, plus the relevant
-universal Portrait- or Battlemap-Specific Additions as applicable — note
-the Battlemap Addition specifies a **5-foot-per-square grid** (5e's actual
-default unit; don't substitute a different game's grid convention). Save
-all prompts into `<output-folder>/image-prompts/`, one file per image, each
-labeled with the German name/scene it belongs to, since these are meant to
-be run through the GM's own external image tool.
+For every PC portrait, major NPC, key location, 1-2 battlemaps for the
+climax fight, and one regional overview map showing where in the world
+this one-shot takes place: write an English image-generation prompt
+appending the GM's selected style preset from `references/style-guide.md`,
+plus the relevant universal Portrait-, Battlemap-, or Map-Specific
+Additions as applicable — note the Battlemap Addition specifies a
+**5-foot-per-square grid** (5e's actual default unit; don't substitute a
+different game's grid convention). The regional map plots every named
+location from Step 6's scenes onto a single image in their scene sequence
+— see "Map-Specific Additions" in the style guide for what to label and
+how. Save all prompts into `<output-folder>/image-prompts/`, one file per
+image (the map as `map-regional-overview.txt`), each labeled with the
+German name/scene it belongs to, since these are meant to be run through
+the GM's own external image tool. After writing the map prompt, add one
+line to the GM guide directly below its premise section: "**Regionale
+Karte:** siehe `image-prompts/map-regional-overview.txt`" — matching how
+NPC blocks already point to their own image-prompt file.
 
 ## Step 9: Assemble the output folder
 
@@ -341,7 +349,8 @@ oneshots/<date>-<slug>/
     ├── portrait-<name>.txt
     ├── npc-<name>.txt
     ├── location-<name>.txt
-    └── battlemap-<scene>.txt
+    ├── battlemap-<scene>.txt
+    └── map-regional-overview.txt
 ```
 
 If any character's PDF fill step fails, report the failing field name and
