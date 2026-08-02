@@ -313,15 +313,30 @@ tied to a specific PC), `## Spielleitung` (GM roleplay notes), plus a
 
 ## Step 8: Generate image prompts
 
-For every PC portrait, major NPC, key location, and 1-2 battlemaps for the
-climax fight: write an English image-generation prompt appending the GM's
-selected style preset from `references/style-guide.md`, plus the relevant
-universal Portrait- or Battlemap-Specific Additions as applicable — note
-the Battlemap Addition specifies a **5-foot-per-square grid** (5e's actual
-default unit; don't substitute a different game's grid convention). Save
-all prompts into `<output-folder>/image-prompts/`, one file per image, each
-labeled with the German name/scene it belongs to, since these are meant to
-be run through the GM's own external image tool.
+For every PC portrait, major NPC, key location, 1-2 battlemaps for the
+climax fight, and two regional overview maps showing where in the world
+this one-shot takes place — one GM-facing, one player-facing — write an
+English image-generation prompt appending the GM's selected style preset
+from `references/style-guide.md`, plus the relevant universal Portrait-,
+Battlemap-, or Map-Specific Additions as applicable — note the Battlemap
+Addition specifies a **5-foot-per-square grid** (5e's actual default
+unit; don't substitute a different game's grid convention). The GM map
+plots every named location from Step 6's scenes onto a single image in
+their scene sequence, exactly as before; the player map instead shows
+only locations that are common public knowledge independent of this
+specific plot (general regional geography, well-known public landmarks,
+and the party's own starting location) — see "Map-Specific Additions" in
+the style guide, now split into a "GM Map" and "Player Map" subsection,
+for exactly what each may and may not show. Save all prompts into
+`<output-folder>/image-prompts/`, one file per image (the two maps as
+`map-gm.txt` and `map-player.txt`), each labeled with the German
+name/scene it belongs to, since these are meant to be run through the
+GM's own external image tool. After writing both map prompts, add two
+lines to the GM guide directly below its premise section: "**Regionale
+Karte (GM, mit Spoilern):** siehe `image-prompts/map-gm.txt`" and
+"**Regionale Karte (Spieler:innen, spoilerfrei — direkt am Tisch
+zeigbar):** siehe `image-prompts/map-player.txt`" — matching how NPC
+blocks already point to their own image-prompt file.
 
 ## Step 9: Assemble the output folder
 
@@ -341,7 +356,9 @@ oneshots/<date>-<slug>/
     ├── portrait-<name>.txt
     ├── npc-<name>.txt
     ├── location-<name>.txt
-    └── battlemap-<scene>.txt
+    ├── battlemap-<scene>.txt
+    ├── map-gm.txt
+    └── map-player.txt
 ```
 
 If any character's PDF fill step fails, report the failing field name and

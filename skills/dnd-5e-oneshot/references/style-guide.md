@@ -3,10 +3,11 @@
 This guide defines five selectable visual style presets. A step in SKILL.md
 asks the GM to pick one for the run; append that preset's Style Block,
 verbatim, to the end of every generated image prompt (portraits, NPCs,
-locations, battlemaps) in that run — never mix presets within one run. The
-Portrait-Specific and Battlemap-Specific Additions below are universal: they
-apply after any preset's base block, regardless of which one was picked,
-since they describe framing/composition, not rendering technique.
+locations, battlemaps, the regional maps) in that run — never mix presets
+within one run. The Portrait-Specific, Battlemap-Specific, and Map-Specific
+Additions below are universal: they apply after any preset's base block,
+regardless of which one was picked, since they describe framing/composition,
+not rendering technique.
 
 ## Style Presets
 
@@ -111,3 +112,82 @@ base style block for battlemaps: "top-down orthographic view, grid-friendly
 composition (assume a 5-foot-per-square grid, per `dnd5e-rules-summary.md`),
 key cover/terrain elements clearly delineated and labeled, no character
 figures — environment only."
+
+## Map-Specific Additions
+
+Applies regardless of which preset was selected above. Two separate maps
+are generated per one-shot — write each as its own image-prompt file, both
+using the same style preset so they visually match, but differing in what
+content they're allowed to show.
+
+### GM Map
+
+Save as `map-gm.txt`. Append to the chosen base style block: "hand-drawn
+fantasy cartography in the tradition of a Player's Handbook regional map
+or an in-world explorer's map — aged parchment or vellum texture,
+ink-and-watercolor linework, a decorative compass rose and rustic border,
+hand-lettered place names in a fantasy-appropriate script." Since D&D's
+homebrew world has no fixed canonical geography, invent place names and
+their spatial relationships purely from what this specific one-shot's
+scenario established in Steps 3, 6, and 7 — don't borrow real-world or
+published-setting geography.
+
+Label every named location that appears in the GM guide's scenes (Step 6)
+directly on the map, and connect them with a visible path or road, or
+numbered markers, matching scene order (1 = hook location, 2 = next scene,
+etc.) so a GM can trace the party's route across the session at a glance.
+Mark the party's starting location (Scene 1) with a distinct "you are
+here"-style icon or flag, separate from the later scene markers. This
+file is for the GM's own reference only — full plot content is expected:
+label secret or hidden locations by their true plot-relevant identity (a
+villain's hidden lair, a cultist shrine discovered mid-scenario), and
+include any off-screen hint (a distant unlabeled landmark pointing toward
+an antagonist's origin, etc.) that helps the GM keep the wider world
+consistent.
+
+This is not a battlemap: no combat grid, no 5-foot-per-square scale
+callout, and — unlike the Battlemap Addition's "no character figures —
+environment only" restriction — small stylized landmark icons (a mine
+entrance, a town's walls, a forest treeline) are welcome if they aid
+readability. The goal is a legible "where are we in the world" reference
+image, not tactical accuracy.
+
+### Player Map
+
+Save as `map-player.txt`. This file is safe to display or hand out
+directly at the table, so it must contain nothing that reveals this
+one-shot's plot. Append to the same chosen base style block: "hand-drawn
+fantasy cartography in the tradition of a Player's Handbook regional map
+or an in-world explorer's map — aged parchment or vellum texture,
+ink-and-watercolor linework, a decorative compass rose and rustic border,
+hand-lettered place names in a fantasy-appropriate script." Invent the
+same underlying geography as the GM map (same town names, same rough
+layout) so the two maps clearly depict the same world, but restrict what
+gets labeled: only settlements, roads, and natural landmarks that would
+be common knowledge to anyone living in or traveling through the region
+— the town the party starts in, a nearby market town, a well-known road,
+river, forest, or mountain range by its ordinary regional name.
+
+Explicitly exclude any location whose relevance is a plot discovery: a
+monster's lair found via investigation, a hidden temple or ritual
+chamber, a villain's true hideout, or any location labeled with
+information the party only learns during play (a dungeon entrance may
+appear as an unlabeled hill or cave mouth, if it would be visible terrain
+at all, but never labeled with its plot-relevant name or purpose). The
+party's own starting location (their home village, the inn they set out
+from) may still be marked with a "you are here"-style icon or flag
+exactly as on the GM map, since the party already knows where they
+start — that's orientation, not a spoiler.
+
+Omit entirely, regardless of how minor it seems: scene-order numbering,
+paths or roads drawn specifically to connect scenes, and any hint — even
+vague, unlabeled, or easy to miss — of an off-screen element the plot
+hasn't revealed yet (an unlabeled temple icon hinting at a distant
+antagonist's origin is exactly the kind of detail that must be cut, not
+softened). When in doubt whether a detail counts as common knowledge,
+leave it off the player map; it's better to under-include than to leak a
+discovery. This is not a battlemap: no combat grid, no 5-foot-per-square
+scale callout, but small stylized landmark icons (a town's walls, a
+forest treeline) are welcome if they aid readability. The goal is a
+legible, spoiler-free "where are we in the world" reference the GM can
+hand to players without hesitation.
