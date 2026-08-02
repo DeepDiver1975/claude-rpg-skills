@@ -1,0 +1,16 @@
+{
+  "name": "Corp-Wachmann",
+  "stats": {"INT": 4, "REF": 5, "DEX": 5, "TECH": 3, "COOL": 5, "WILL": 4, "LUCK": 3, "MOVE": 5, "BODY": 5, "EMP": 3},
+  "hit_points": 20,
+  "seriously_wounded": 10,
+  "death_save": 5,
+  "skill_bases": "Handgun +5, Stealth +3, Athletics +3",
+  "weapons": [
+    {"name": "Medium Pistol", "damage": "2d6"},
+    {"name": "Schlagstock", "damage": "1d6"}
+  ],
+  "armor_type": "Corp-Sicherheitsweste",
+  "head_sp": 0,
+  "body_sp": 8,
+  "cyberware_special_equipment": "Funkgerät, Neuralware-Kommlink"
+}

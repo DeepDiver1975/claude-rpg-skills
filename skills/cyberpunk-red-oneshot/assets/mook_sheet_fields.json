@@ -1,0 +1,137 @@
+[
+  {
+    "type": "Text",
+    "name": "Name",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "INT",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "WILL",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Hit Points",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Weapon 1",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Weapon 2",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Skill Bases",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Cyberware & Special Equipment",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "REF",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "DEX",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "TECH",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "COOL",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "LUCK",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "MOVE",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "BODY",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "EMP",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Seriously Wounded",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Death Save",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Damage 1",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Damage 2",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Weapon 3",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Damage 3",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Weapon 4",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Damage 4",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Armor Type",
+    "justification": "Left"
+  },
+  {
+    "type": "Text",
+    "name": "Head SP",
+    "justification": "Center"
+  },
+  {
+    "type": "Text",
+    "name": "Body SP",
+    "justification": "Center"
+  }
+]

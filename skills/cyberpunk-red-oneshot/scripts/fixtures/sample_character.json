@@ -1,0 +1,19 @@
+{
+  "handle": "Rüdiger \"Rook\" Straße",
+  "role": "Solo",
+  "role_ability": "Combat Awareness",
+  "role_ability_rank": 4,
+  "stats": {"INT": 5, "REF": 6, "DEX": 5, "TECH": 4, "COOL": 6, "WILL": 5, "LUCK": 5, "MOVE": 5, "BODY": 5, "EMP": 4},
+  "hp": {"current": 35, "max": 35},
+  "humanity": {"current": 50, "max": 50},
+  "luck": {"current": 5, "max": 5},
+  "skills": {"Athletics": 4, "Shoulder Arms": 6, "Stealth": 3},
+  "weapons": [
+    {"name": "Medium Pistol", "dmg": "2d6", "ammo": "10(c)", "rof": "2", "notes": ""}
+  ],
+  "armor": {"head": {"sp": 0, "penalty": 0}, "body": {"sp": 11, "penalty": 0}, "shield": {"sp": 0, "penalty": 0}},
+  "fashion": "Abgewetzte Lederjacke, Militärstiefel",
+  "role_specific_lifepath": "Ehemaliger Corp-Soldat, im Streit mit seiner alten Einheit gebrochen.",
+  "notes": "Mistraut Corps zutiefst.",
+  "portrait_image_path": null
+}
