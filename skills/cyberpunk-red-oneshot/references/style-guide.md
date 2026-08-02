@@ -3,7 +3,7 @@
 This guide defines five selectable visual style presets. A new step in
 SKILL.md asks the GM to pick one for the run; append that preset's Style
 Block, verbatim, to the end of every generated image prompt (portraits,
-NPCs, locations, battlemaps, the regional map) in that run — never mix
+NPCs, locations, battlemaps, the regional maps) in that run — never mix
 presets within one run. The Portrait-Specific, Battlemap-Specific, and
 Map-Specific Additions below are universal: they apply after any preset's
 base block, regardless of which one was picked, since they describe
@@ -117,27 +117,83 @@ delineated and labeled, no character figures — environment only."
 
 ## Map-Specific Additions
 
-Applies regardless of which preset was selected above. Append to the chosen
-base style block for the one regional overview map: "stylized graphic
-district/transit map of Night City in the tradition of corporate transit
-maps and gang-territory intel maps — bird's-eye/schematic angle (not a
-photorealistic aerial photo), bold labeled district and street names, clean
-iconography for key landmarks rendered as simplified pictograms rather than
-detailed illustration." Night City's real district names (Watson, Heywood,
-Westbrook, Pacifica, Santo Domingo, City Center, Northside, Combat Zone,
-Badlands) may be used to place the scenario geographically; if the
-scenario's locations don't map cleanly onto real Night City geography, keep
-the map schematic/abstract rather than inventing precise geographic claims.
+Applies regardless of which preset was selected above. Two separate maps
+are generated per one-shot — write each as its own image-prompt file, both
+using the same style preset so they visually match, but differing in what
+content they're allowed to show.
+
+### GM Map
+
+Save as `map-gm.txt`. Append to the chosen base style block: "stylized
+graphic district/transit map of Night City in the tradition of corporate
+transit maps and gang-territory intel maps — bird's-eye/schematic angle
+(not a photorealistic aerial photo), bold labeled district and street
+names, clean iconography for key landmarks rendered as simplified
+pictograms rather than detailed illustration." Night City's real district
+names (Watson, Heywood, Westbrook, Pacifica, Santo Domingo, City Center,
+Northside, Combat Zone, Badlands) may be used to place the scenario
+geographically; if the scenario's locations don't map cleanly onto real
+Night City geography, keep the map schematic/abstract rather than
+inventing precise geographic claims.
 
 Label every named location that appears in the GM guide's scenes (Step 6)
 directly on the map, and connect them with a visible route or numbered
-markers matching scene order (1 = hook location, 2 = next scene, etc.) so a
-GM can trace the crew's path across the session at a glance. Mark the
+markers matching scene order (1 = hook location, 2 = next scene, etc.) so
+a GM can trace the crew's path across the session at a glance. Mark the
 crew's starting location (Scene 1) with a distinct "you are here"-style
-icon or highlight, separate from the later scene markers.
+icon or highlight, separate from the later scene markers. This file is
+for the GM's own reference only — full plot content is expected: name
+locations by their plot-relevant identity (a corp's covert front, a
+gang's hidden stash house), and include faction/gang-territory color
+overlays wherever they help a GM read who secretly controls what.
 
-This is not a battlemap: no combat grid, no scale callout, and — unlike the
-Battlemap Addition's "no character figures — environment only" restriction
-— small stylized landmark icons, vehicle silhouettes, or gang-territory
-color overlays are welcome if they aid readability. The goal is a legible
-"where are we in Night City" reference image, not tactical accuracy.
+This is not a battlemap: no combat grid, no scale callout, and — unlike
+the Battlemap Addition's "no character figures — environment only"
+restriction — small stylized landmark icons, vehicle silhouettes, or
+gang-territory color overlays are welcome if they aid readability. The
+goal is a legible "where are we in Night City" reference image, not
+tactical accuracy.
+
+### Player Map
+
+Save as `map-player.txt`. This file is safe to display or hand out
+directly at the table, so it must contain nothing that reveals this
+one-shot's plot. Append to the same chosen base style block: "stylized
+graphic district/transit map of Night City in the tradition of corporate
+transit maps and tourist/civic district maps — bird's-eye/schematic angle
+(not a photorealistic aerial photo), bold labeled district and street
+names, clean iconography for landmarks rendered as simplified pictograms
+rather than detailed illustration." Night City's real district names
+(Watson, Heywood, Westbrook, Pacifica, Santo Domingo, City Center,
+Northside, Combat Zone, Badlands) may be used the same way as on the GM
+map, to place the scenario in the city; well-known public landmarks (a
+stadium, a mall, a transit line, a well-known corp plaza) may also be
+labeled if they help orient the map, since these are common knowledge to
+any Night City local.
+
+Show only locations and details that are genuinely common knowledge
+independent of this specific job — general district and street geography,
+public landmarks — and explicitly exclude any location whose relevance is
+a plot discovery: a hideout the crew finds mid-investigation, a front
+company's covert identity, a gang's secret stash house, or any other
+location named or labeled specifically because of what this one-shot's
+scenes reveal about it. If a real place is both geographically real and
+plot-relevant (e.g. a dockside warehouse whose owner is a Scene 3 reveal),
+it may appear on the player map only as unlabeled scenery or under a
+generic, non-revealing label ("a warehouse," "the docks") — never under
+the name or role the crew learns during play. The crew's own starting
+location (their usual hangout, a fixer's known storefront, their home
+turf) may still be marked with a "you are here"-style icon exactly as on
+the GM map, since the party already knows where they start — that's
+orientation, not a spoiler.
+
+Omit entirely, regardless of how minor it seems: scene-order numbering,
+route lines or markers connecting scenes, gang-territory color overlays
+that reveal who secretly controls a location, and any hint — even vague,
+unlabeled, or easy to miss — of an off-screen element the plot hasn't
+revealed yet. When in doubt whether a detail counts as common knowledge,
+leave it off the player map; it's better to under-include than to leak a
+discovery. This is not a battlemap: no combat grid, no scale callout, but
+small stylized landmark icons or vehicle silhouettes are welcome if they
+aid readability. The goal is a legible, spoiler-free "where are we in
+Night City" reference the GM can hand to players without hesitation.
