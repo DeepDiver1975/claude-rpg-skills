@@ -10,6 +10,7 @@ tooling. Each skill lives in its own self-contained subdirectory under
 | Skill | What it does |
 |---|---|
 | [`cyberpunk-red-oneshot`](skills/cyberpunk-red-oneshot/README.md) | Generates a complete Cyberpunk RED one-shot: pregenerated characters as filled official PDF sheets, a scenario with GM notes, NPC/enemy stat blocks, and image-generation prompts. |
+| [`dnd-5e-oneshot`](skills/dnd-5e-oneshot/README.md) | Generates a complete D&D 5e (2024 rules / SRD 5.2.1) one-shot: pregenerated characters as filled official PDF sheets, a scenario with GM notes, NPC/monster Markdown stat blocks, and image-generation prompts. |
 
 ## Using a skill
 
