@@ -10,34 +10,46 @@
     <div class="identity">
       <h1 class="handle">{{ character.handle }}</h1>
       <div class="role-line">
-        <span class="role">{{ character.role }}</span>
-        <span class="role-ability">{{ character.role_ability }} (Rang {{ character.role_ability_rank }})</span>
+        <span class="role-badge">{{ character.role }}</span>
+        <span class="role-ability">{{ character.role_ability }} · Rank {{ character.role_ability_rank }}</span>
       </div>
     </div>
     {% if portrait_data_uri %}
-    <div class="portrait-box">
+    <div class="portrait-box corner-frame">
       <img class="portrait" src="{{ portrait_data_uri }}" alt="Portrait von {{ character.handle }}">
     </div>
     {% endif %}
   </header>
 
-  <section class="trackers">
-    <div class="tracker">
-      <span class="tracker-label">Trefferpunkte</span>
-      <span class="tracker-value">{{ character.hp.current }} / {{ character.hp.max }}</span>
+  <div class="hazard-stripe"></div>
+
+  <section class="trackers-section">
+    <div class="trackers">
+      <div class="tracker corner-frame">
+        <span class="tracker-label">Hit Points</span>
+        <span class="tracker-value">{{ character.hp.current }}/{{ character.hp.max }}</span>
+      </div>
+      <div class="tracker corner-frame">
+        <span class="tracker-label">Humanity</span>
+        <span class="tracker-value">{{ character.humanity.current }}/{{ character.humanity.max }}</span>
+      </div>
+      <div class="tracker corner-frame">
+        <span class="tracker-label">Luck</span>
+        <span class="tracker-value">{{ character.luck.current }}/{{ character.luck.max }}</span>
+      </div>
+      <div class="tracker corner-frame">
+        <span class="tracker-label">Reputation</span>
+        <span class="tracker-value">{{ reputation }}</span>
+      </div>
     </div>
-    <div class="tracker">
-      <span class="tracker-label">Humanity</span>
-      <span class="tracker-value">{{ character.humanity.current }} / {{ character.humanity.max }}</span>
-    </div>
-    <div class="tracker">
-      <span class="tracker-label">Luck Points</span>
-      <span class="tracker-value">{{ character.luck.current }} / {{ character.luck.max }}</span>
+    <div class="wound-line">
+      <span>SERIOUSLY WOUNDED <b>{{ seriously_wounded }}</b></span>
+      <span>DEATH SAVE <b>{{ death_save }}</b></span>
     </div>
   </section>
 
   <section class="stats">
-    <h2>Attribute</h2>
+    <div class="section-label">Stats</div>
     <div class="stats-grid">
       {% for stat_name, stat_value in character.stats.items() %}
       <div class="stat-box">
@@ -49,30 +61,36 @@
   </section>
 
   <section class="skills">
-    <h2>Skills</h2>
-    <div class="skills-grid">
-      {% for skill_name, level in character.skills.items() | sort %}
-      <div class="skill-row">
-        <span class="skill-name">{{ skill_name }}</span>
-        <span class="skill-level">{{ level }}</span>
-      </div>
-      {% endfor %}
+    <div class="section-label">Skills</div>
+    <div class="skills-table">
+      <table>
+        <thead><tr><th>Skill</th><th class="mono">LVL</th><th class="mono">TOTAL</th></tr></thead>
+        <tbody>
+          {% for skill in skills %}
+          <tr>
+            <td>{{ skill.name }} <span style="color: var(--chrome);">({{ skill.stat }})</span></td>
+            <td class="mono">{{ skill.level }}</td>
+            <td class="mono total">{{ skill.total }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </section>
 
   <section class="weapons">
-    <h2>Waffen</h2>
+    <div class="section-label">Weapons</div>
     <table>
       <thead>
-        <tr><th>Waffe</th><th>Schaden</th><th>Munition</th><th>ROF</th><th>Notizen</th></tr>
+        <tr><th>Weapon</th><th>Dmg</th><th>Ammo</th><th>ROF</th><th>Notes</th></tr>
       </thead>
       <tbody>
         {% for weapon in character.weapons %}
         <tr>
           <td>{{ weapon.name }}</td>
-          <td>{{ weapon.dmg }}</td>
+          <td class="mono">{{ weapon.dmg }}</td>
           <td>{{ weapon.ammo }}</td>
-          <td>{{ weapon.rof }}</td>
+          <td class="mono">{{ weapon.rof }}</td>
           <td>{{ weapon.notes }}</td>
         </tr>
         {% endfor %}
@@ -80,33 +98,56 @@
     </table>
   </section>
 
+  {% if cyberware %}
+  <section class="cyberware">
+    <div class="section-label">Cyberware</div>
+    <table>
+      <thead><tr><th>Item</th><th>Effect</th></tr></thead>
+      <tbody>
+        {% for item in cyberware %}
+        <tr><td>{{ item.name }}</td><td>{{ item.effect }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
   <section class="armor">
-    <h2>Rüstung</h2>
+    <div class="section-label">Armor</div>
     <table>
       <thead>
         <tr><th></th><th>SP</th><th>Penalty</th></tr>
       </thead>
       <tbody>
-        <tr><td>Kopf</td><td>{{ character.armor.head.sp }}</td><td>{{ character.armor.head.penalty }}</td></tr>
-        <tr><td>Körper</td><td>{{ character.armor.body.sp }}</td><td>{{ character.armor.body.penalty }}</td></tr>
-        <tr><td>Schild</td><td>{{ character.armor.shield.sp }}</td><td>{{ character.armor.shield.penalty }}</td></tr>
+        <tr><td>Head</td><td class="mono">{{ character.armor.head.sp }}</td><td class="mono">{{ character.armor.head.penalty }}</td></tr>
+        <tr><td>Body</td><td class="mono">{{ character.armor.body.sp }}</td><td class="mono">{{ character.armor.body.penalty }}</td></tr>
+        <tr><td>Shield</td><td class="mono">{{ character.armor.shield.sp }}</td><td class="mono">{{ character.armor.shield.penalty }}</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="freetext">
     <div class="freetext-block">
-      <h2>Style</h2>
+      <div class="section-label">Style</div>
       <p>{{ character.fashion }}</p>
     </div>
     <div class="freetext-block">
-      <h2>Lifepath</h2>
+      <div class="section-label">Lifepath</div>
       <p>{{ character.role_specific_lifepath }}</p>
     </div>
     <div class="freetext-block">
-      <h2>Notizen</h2>
+      <div class="section-label">Notes</div>
       <p>{{ character.notes }}</p>
     </div>
+    <div class="freetext-block">
+      <div class="section-label">Critical Injuries</div>
+      <div class="crit-box">
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
   </section>
+
+  <footer>Cyberpunk RED // Rank 0 Dossier // Night City</footer>
 </body>
 </html>

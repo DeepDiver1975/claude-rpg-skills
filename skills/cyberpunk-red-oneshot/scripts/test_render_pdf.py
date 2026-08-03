@@ -21,13 +21,27 @@ def test_data_uri_round_trips_exact_bytes(tmp_path):
     assert base64.b64decode(encoded) == original
 
 
-def test_load_css_with_fonts_replaces_both_placeholders():
-    css_path = SKILL_DIR / "assets" / "character_sheet.css"
+def test_load_css_with_fonts_replaces_font_placeholders(tmp_path):
+    css_path = tmp_path / "fixture.css"
+    css_path.write_text(
+        '@font-face { src: url("__FONT:NotoSans-Regular.ttf__"); }\n'
+        '@font-face { src: url("__FONT:NotoSans-Bold.ttf__"); }\n',
+        encoding="utf-8",
+    )
+
     css = load_css_with_fonts(css_path, FONTS_DIR)
 
-    assert "__FONT_REGULAR_DATA_URI__" not in css
-    assert "__FONT_BOLD_DATA_URI__" not in css
+    assert "__FONT:" not in css
     assert css.count("data:font/ttf;base64,") == 2
+
+
+def test_load_css_with_fonts_covers_every_placeholder_used_by_the_real_stylesheets():
+    # Guards against a typo'd filename in a real .css file's @font-face rules —
+    # a missing font would silently fall back to a system default rather than
+    # error, so this checks every placeholder resolves to a file that exists.
+    for css_name in ("character_sheet.css", "mook_sheet.css"):
+        css_path = SKILL_DIR / "assets" / css_name
+        load_css_with_fonts(css_path, FONTS_DIR)
 
 
 def test_render_html_to_pdf_produces_a_readable_pdf(tmp_path):

@@ -1,111 +1,227 @@
 @font-face {
+  font-family: "Archivo Black";
+  font-weight: 400;
+  src: url("__FONT:ArchivoBlack-Regular.ttf__");
+}
+@font-face {
   font-family: "Noto Sans";
   font-weight: 400;
-  src: url("__FONT_REGULAR_DATA_URI__");
+  src: url("__FONT:NotoSans-Regular.ttf__");
 }
 @font-face {
   font-family: "Noto Sans";
   font-weight: 700;
-  src: url("__FONT_BOLD_DATA_URI__");
+  src: url("__FONT:NotoSans-Bold.ttf__");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 400;
+  src: url("__FONT:JetBrainsMono-Regular.ttf__");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 700;
+  src: url("__FONT:JetBrainsMono-Bold.ttf__");
+}
+
+:root {
+  --ink: #15130f;
+  --paper: #f3efe4;
+  --hazard: #ffc300;
+  --circuit: #0d7d76;
+  --alert: #c81e1e;
+  --chrome: #5b5b63;
+  --hairline: #c9c3b2;
 }
 
 @page {
   size: A4;
-  margin: 14mm 16mm;
+  margin: 13mm 15mm;
 }
 
 * { box-sizing: border-box; }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  font-size: 10.5pt;
-  color: #1a1a1a;
+  font-size: 10pt;
+  color: var(--ink);
+  background: var(--paper);
   margin: 0;
 }
 
-h1, h2 { margin: 0; font-weight: 700; }
+h1, h2 { margin: 0; }
 
-h2 {
-  font-size: 11pt;
+/* Reusable HUD-bracket corner motif: a target-lock frame in the two corners
+   that read a box's extent at a glance (top-left/bottom-right), drawn via
+   ::before/::after so it applies cleanly to any box (portrait frame, tracker
+   chips) without extra DOM nodes. */
+.corner-frame { position: relative; }
+.corner-frame::before, .corner-frame::after {
+  content: "";
+  position: absolute;
+  width: 8pt;
+  height: 8pt;
+  border: 1.5pt solid var(--hazard);
+}
+.corner-frame::before { top: -1.5pt; left: -1.5pt; border-right: none; border-bottom: none; }
+.corner-frame::after { bottom: -1.5pt; right: -1.5pt; border-left: none; border-top: none; }
+
+/* Section headers: small hazard tick + tracked display caps + a plain rule —
+   the accent color is spent on the tick, not repeated across the whole rule. */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 10.5pt;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #b8860b;
-  border-bottom: 1.5pt solid #b8860b;
-  padding-bottom: 2pt;
-  margin-bottom: 6pt;
+  letter-spacing: 0.07em;
+  color: var(--ink);
+  border-bottom: 1pt solid var(--ink);
+  padding-bottom: 3pt;
+  margin-bottom: 7pt;
+}
+.section-label::before {
+  content: "";
+  width: 7pt;
+  height: 7pt;
+  background: var(--hazard);
+  flex-shrink: 0;
 }
 
-section { margin-top: 12pt; break-inside: avoid; }
+section { margin-top: 13pt; }
+tr { break-inside: avoid; }
 
 /* Header */
 .sheet-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 3pt solid #1a1a1a;
-  padding-bottom: 8pt;
 }
-.handle { font-size: 26pt; line-height: 1.1; }
-.role-line { margin-top: 4pt; font-size: 12pt; }
-.role { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-.role-ability { margin-left: 8pt; color: #444; }
+.identity { flex: 1; }
+.handle {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 27pt;
+  line-height: 1.05;
+}
+.role-line { margin-top: 5pt; display: flex; align-items: center; gap: 8pt; }
+.role-badge {
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10pt;
+  padding: 3pt 8pt;
+  background: var(--hazard);
+  color: var(--ink);
+}
+.role-ability { font-size: 10.5pt; color: var(--chrome); }
 .portrait-box {
   width: 32mm;
   height: 40mm;
   flex-shrink: 0;
-  border: 1.5pt solid #1a1a1a;
-  overflow: hidden;
   margin-left: 10pt;
+  padding: 3pt;
 }
 .portrait { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
-/* Trackers (HP / Humanity / Luck) */
-.trackers { display: flex; gap: 8pt; }
-.tracker {
-  flex: 1;
-  border: 1pt solid #1a1a1a;
-  padding: 6pt 8pt;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+.hazard-stripe {
+  height: 6pt;
+  margin: 9pt 0 3pt;
+  background: repeating-linear-gradient(
+    135deg, var(--hazard) 0, var(--hazard) 8pt, var(--ink) 8pt, var(--ink) 16pt
+  );
 }
-.tracker-label { font-size: 9pt; text-transform: uppercase; letter-spacing: 0.04em; color: #444; }
-.tracker-value { font-size: 13pt; font-weight: 700; }
+
+/* Trackers: HP / Humanity / Luck / Reputation */
+.trackers { display: flex; gap: 7pt; margin-top: 10pt; }
+.tracker { flex: 1; padding: 7pt 8pt; text-align: center; }
+.tracker-label {
+  display: block;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--chrome);
+}
+.tracker-value {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 15pt;
+  margin-top: 2pt;
+}
+
+.wound-line {
+  margin-top: 6pt;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8.5pt;
+  color: var(--chrome);
+  display: flex;
+  gap: 18pt;
+}
+.wound-line b { color: var(--alert); font-weight: 700; }
 
 /* Stats grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6pt;
-}
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6pt; }
 .stat-box {
-  border: 1pt solid #1a1a1a;
   padding: 5pt 4pt;
   text-align: center;
+  border-top: 1.5pt solid var(--ink);
+  border-bottom: 0.5pt solid var(--hairline);
 }
-.stat-name { display: block; font-size: 8pt; text-transform: uppercase; color: #444; }
-.stat-value { display: block; font-size: 15pt; font-weight: 700; }
+.stat-name {
+  display: block;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: var(--chrome);
+}
+.stat-value {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 15pt;
+}
 
-/* Skills grid */
-.skills-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2pt 16pt;
-}
-.skill-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 0.5pt dotted #999;
-  padding: 1.5pt 0;
-  font-size: 9.5pt;
-}
-.skill-level { font-weight: 700; }
-
-/* Tables (weapons / armor) */
+/* Skills table: NAME / STAT / LVL / TOTAL */
 table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
-th, td { text-align: left; padding: 4pt 6pt; border-bottom: 0.5pt solid #ccc; }
-th { text-transform: uppercase; font-size: 8pt; color: #444; letter-spacing: 0.03em; }
+th, td { text-align: left; padding: 3.5pt 6pt; border-bottom: 0.5pt solid var(--hairline); }
+th {
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  color: var(--chrome);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+td.mono, th.mono { font-family: "JetBrains Mono", monospace; }
+td.total { color: var(--circuit); font-weight: 700; }
+
+.skills-table { column-count: 2; column-gap: 16pt; }
+.skills-table table { break-inside: avoid; }
 
 /* Free text blocks */
-.freetext-block { margin-top: 8pt; }
+.freetext-block { margin-top: 9pt; break-inside: avoid; }
 .freetext-block p { margin: 0; white-space: pre-wrap; }
+
+.crit-box {
+  border: 0.75pt solid var(--hairline);
+  padding: 8pt;
+  min-height: 24pt;
+}
+.crit-box .fill-line {
+  border-bottom: 0.5pt dotted var(--hairline);
+  height: 11pt;
+}
+.crit-box .fill-line:last-child { border-bottom: none; }
+
+footer {
+  margin-top: 16pt;
+  padding-top: 5pt;
+  border-top: 0.5pt solid var(--hairline);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 7pt;
+  color: var(--chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

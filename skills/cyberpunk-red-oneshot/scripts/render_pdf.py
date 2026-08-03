@@ -2,9 +2,12 @@
 and base64-encode local files (fonts, portraits) as embeddable data: URIs.
 """
 import base64
+import re
 from pathlib import Path
 
 from weasyprint import HTML
+
+_FONT_PLACEHOLDER_RE = re.compile(r"__FONT:([\w.\-]+)__")
 
 
 def data_uri(path: Path, mime_type: str) -> str:
@@ -19,18 +22,15 @@ def data_uri(path: Path, mime_type: str) -> str:
 
 
 def load_css_with_fonts(css_path: Path, fonts_dir: Path) -> str:
-    """Read `css_path` and inline the bundled Noto Sans font files as data:
-    URIs in place of the `__FONT_REGULAR_DATA_URI__` / `__FONT_BOLD_DATA_URI__`
-    placeholders its @font-face rules use.
+    """Read `css_path` and inline every bundled font file it references as a
+    data: URI. Its @font-face rules reference fonts as
+    `src: url("__FONT:<filename>__")`; each placeholder is replaced with that
+    exact file's contents from `fonts_dir`.
     """
     css = Path(css_path).read_text(encoding="utf-8")
-    css = css.replace(
-        "__FONT_REGULAR_DATA_URI__", data_uri(fonts_dir / "NotoSans-Regular.ttf", "font/ttf")
+    return _FONT_PLACEHOLDER_RE.sub(
+        lambda m: data_uri(fonts_dir / m.group(1), "font/ttf"), css
     )
-    css = css.replace(
-        "__FONT_BOLD_DATA_URI__", data_uri(fonts_dir / "NotoSans-Bold.ttf", "font/ttf")
-    )
-    return css
 
 
 def render_html_to_pdf(html: str, output_pdf: Path) -> None:

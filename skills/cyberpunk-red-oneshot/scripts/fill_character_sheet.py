@@ -2,6 +2,7 @@
 """Render a Cyberpunk RED character sheet PDF from a character JSON file."""
 import argparse
 import json
+import math
 from pathlib import Path
 
 import jinja2
@@ -18,26 +19,42 @@ _ENV = jinja2.Environment(
 
 _PORTRAIT_MIME_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
 
-# The sheet's primary skill list. Kept as an explicit allow-list (rather than
-# accepting any string) so a typo'd or invented skill name fails loudly instead
-# of silently printing on the sheet — same guardrail the old AcroForm field map
-# gave us for free, now that there's no field map to check membership against.
-VALID_SKILLS = {
-    "Accounting", "Acting", "Air Vehicle Tech", "Animal Handling", "Archery",
-    "Athletics", "Autofire (x2)", "Basic Tech", "Brawling", "Bribery",
-    "Bureaucracy", "Business", "Composition", "Contortionist", "Conversation",
-    "Criminology", "Cryptography", "Cybertech", "Dance", "Deduction",
-    "Demolitions (x2)", "Drive Land Vehicle", "Education",
-    "Electronics/Security Tech (x2)", "Endurance", "Evasion", "First Aid",
-    "Forgery", "Heavy Weapons (x2)", "Human Perception", "Interrogation",
-    "Land Vehicle Tech", "Library Search", "Lip Reading", "Martial Arts (x2)",
-    "Melee Weapon", "Paint/Draw/Sculpt", "Paramedic (x2)", "Perception",
-    "Personal Grooming", "Persuasion", "Photography/Film", "Pick Lock",
-    "Pick Pocket", "Pilot Air Vehicle (x2)", "Pilot Sea Vehicle",
-    "Resist Torture/Drugs", "Riding", "Sea Vehicle Tech", "Shoulder Arms",
-    "Stealth", "Streetwise", "Tactics", "Tracking", "Trading",
-    "Wardrobe & Style", "Wilderness Survival",
+# The sheet's primary skill list, mapped to its governing stat — sourced from
+# the official sheet's own AcroForm field names (e.g. "LVLAthletics DEX"),
+# which is the same provenance SKILL.md Step 10 already flags as unverified
+# for ~21 of these. Kept as an explicit allow-list (rather than accepting any
+# string) so a typo'd or invented skill name fails loudly instead of silently
+# printing on the sheet.
+SKILL_GOVERNING_STAT = {
+    "Accounting": "INT", "Acting": "COOL", "Air Vehicle Tech": "TECH",
+    "Animal Handling": "INT", "Archery": "REF", "Athletics": "DEX",
+    "Autofire (x2)": "REF", "Basic Tech": "TECH", "Brawling": "DEX",
+    "Bribery": "COOL", "Bureaucracy": "INT", "Business": "INT",
+    "Composition": "INT", "Contortionist": "DEX", "Conversation": "EMP",
+    "Criminology": "INT", "Cryptography": "INT", "Cybertech": "TECH",
+    "Dance": "DEX", "Deduction": "INT", "Demolitions (x2)": "TECH",
+    "Drive Land Vehicle": "REF", "Education": "INT",
+    "Electronics/Security Tech (x2)": "TECH", "Endurance": "WILL",
+    "Evasion": "DEX", "First Aid": "TECH", "Forgery": "TECH",
+    "Heavy Weapons (x2)": "REF", "Human Perception": "EMP",
+    "Interrogation": "COOL", "Land Vehicle Tech": "TECH",
+    "Library Search": "INT", "Lip Reading": "INT", "Martial Arts (x2)": "DEX",
+    "Melee Weapon": "DEX", "Paint/Draw/Sculpt": "TECH", "Paramedic (x2)": "TECH",
+    "Perception": "INT", "Personal Grooming": "COOL", "Persuasion": "COOL",
+    "Photography/Film": "TECH", "Pick Lock": "TECH", "Pick Pocket": "TECH",
+    "Pilot Air Vehicle (x2)": "REF", "Pilot Sea Vehicle": "REF",
+    "Resist Torture/Drugs": "WILL", "Riding": "REF", "Sea Vehicle Tech": "TECH",
+    "Shoulder Arms": "REF", "Stealth": "DEX", "Streetwise": "COOL",
+    "Tactics": "INT", "Tracking": "INT", "Trading": "COOL",
+    "Wardrobe & Style": "COOL", "Wilderness Survival": "INT",
 }
+VALID_SKILLS = set(SKILL_GOVERNING_STAT)
+
+# CPR's starting Reputation for a new character (not covered by the free
+# reference material this skill sources from — see README/SKILL.md's
+# unverified-content policy); used only when a character JSON predates the
+# `reputation` field.
+DEFAULT_REPUTATION = 2
 
 
 def _portrait_data_uri(portrait_image_path: str | None) -> str | None:
@@ -59,9 +76,25 @@ def render_character_sheet_html(character: dict) -> str:
             "add them there (Task 9) before using a sheet that uses them"
         )
 
+    stats = character["stats"]
+    skills = [
+        {
+            "name": name,
+            "stat": SKILL_GOVERNING_STAT[name],
+            "level": level,
+            "total": level + stats[SKILL_GOVERNING_STAT[name]],
+        }
+        for name, level in sorted(character["skills"].items())
+    ]
+
     template = _ENV.get_template("character_sheet.html.jinja")
     return template.render(
         character=character,
+        skills=skills,
+        seriously_wounded=math.ceil(character["hp"]["max"] / 2),
+        death_save=stats["BODY"],
+        reputation=character.get("reputation", DEFAULT_REPUTATION),
+        cyberware=character.get("cyberware", []),
         portrait_data_uri=_portrait_data_uri(character.get("portrait_image_path")),
         css=load_css_with_fonts(ASSETS_DIR / "character_sheet.css", ASSETS_DIR / "fonts"),
     )

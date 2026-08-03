@@ -120,11 +120,21 @@ Also write a Markdown version of the same character for quick reference.
 
 ### Character JSON Schema
 
-All keys required except `portrait_image_path`. `skills` keys must be normalized
-skill names present in `scripts/fill_character_sheet.py`'s `VALID_SKILLS` (57
-entries covering the sheet's primary skill list) — the script raises an error
-naming any skill you use that isn't in that set, so treat that as a sign to pick
-a different/adjacent skill name rather than inventing one.
+All keys required except `portrait_image_path`, `reputation`, and `cyberware`.
+`skills` keys must be normalized skill names present in
+`scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (57 entries covering
+the sheet's primary skill list, each mapped to the stat it rolls against) — the
+script raises an error naming any skill you use that isn't in that set, so
+treat that as a sign to pick a different/adjacent skill name rather than
+inventing one. The sheet prints each skill's LVL and its rolled TOTAL
+(stat + level) automatically — don't compute or write the total yourself.
+
+`reputation` defaults to 2 (CPR's starting Reputation for a new character) if
+omitted. `seriously_wounded` (Seriously Wounded Threshold) and `death_save`
+are computed automatically from `hp.max` and `stats.BODY` — don't add them to
+the JSON. `cyberware` is an optional list; omit it or leave it `[]` for a
+concept that doesn't call for any — the sheet's Cyberware section is only
+printed when the list is non-empty.
 
 ```json
 {
@@ -136,9 +146,11 @@ a different/adjacent skill name rather than inventing one.
   "hp": {"current": 35, "max": 35},
   "humanity": {"current": 50, "max": 50},
   "luck": {"current": 5, "max": 5},
+  "reputation": 2,
   "skills": {"Athletics": 4, "Shoulder Arms": 6},
   "weapons": [{"name": "Medium Pistol", "dmg": "2d6", "ammo": "10(c)", "rof": "2", "notes": ""}],
   "armor": {"head": {"sp": 0, "penalty": 0}, "body": {"sp": 11, "penalty": 0}, "shield": {"sp": 0, "penalty": 0}},
+  "cyberware": [{"name": "Cybereye (Infrared)", "effect": "string"}],
   "fashion": "string",
   "role_specific_lifepath": "string",
   "notes": "string",

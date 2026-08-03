@@ -8,24 +8,29 @@
 <body>
   <header class="sheet-header">
     <h1 class="name">{{ mook.name }}</h1>
+  </header>
+
+  <div class="hazard-stripe"></div>
+
+  <section class="trackers-section">
     <div class="trackers">
-      <div class="tracker">
-        <span class="tracker-label">HP</span>
+      <div class="tracker corner-frame">
+        <span class="tracker-label">Hit Points</span>
         <span class="tracker-value">{{ mook.hit_points }}</span>
       </div>
-      <div class="tracker">
+      <div class="tracker corner-frame">
         <span class="tracker-label">Seriously Wounded</span>
         <span class="tracker-value">{{ mook.seriously_wounded }}</span>
       </div>
-      <div class="tracker">
+      <div class="tracker corner-frame">
         <span class="tracker-label">Death Save</span>
         <span class="tracker-value">{{ mook.death_save }}</span>
       </div>
     </div>
-  </header>
+  </section>
 
   <section class="stats">
-    <h2>Attribute</h2>
+    <div class="section-label">Stats</div>
     <div class="stats-grid">
       {% for stat_name, stat_value in mook.stats.items() %}
       <div class="stat-box">
@@ -37,35 +42,39 @@
   </section>
 
   <section class="skill-bases">
-    <h2>Skill Bases</h2>
+    <div class="section-label">Skill Bases</div>
     <p>{{ mook.skill_bases }}</p>
   </section>
 
   <section class="weapons">
-    <h2>Waffen</h2>
+    <div class="section-label">Weapons</div>
     <table>
-      <thead><tr><th>Waffe</th><th>Schaden</th></tr></thead>
+      <thead><tr><th>Weapon</th><th>Dmg</th></tr></thead>
       <tbody>
         {% for weapon in mook.weapons %}
-        <tr><td>{{ weapon.name }}</td><td>{{ weapon.damage }}</td></tr>
+        <tr><td>{{ weapon.name }}</td><td class="mono">{{ weapon.damage }}</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </section>
 
   <section class="armor">
-    <h2>Rüstung</h2>
+    <div class="section-label">Armor</div>
     <table>
-      <thead><tr><th>Typ</th><th>Kopf SP</th><th>Körper SP</th></tr></thead>
+      <thead><tr><th>Type</th><th>Head SP</th><th>Body SP</th></tr></thead>
       <tbody>
-        <tr><td>{{ mook.armor_type }}</td><td>{{ mook.head_sp }}</td><td>{{ mook.body_sp }}</td></tr>
+        <tr><td>{{ mook.armor_type }}</td><td class="mono">{{ mook.head_sp }}</td><td class="mono">{{ mook.body_sp }}</td></tr>
       </tbody>
     </table>
   </section>
 
   <section class="freetext">
-    <h2>Cyberware &amp; Sonderausrüstung</h2>
-    <p>{{ mook.cyberware_special_equipment }}</p>
+    <div class="freetext-block">
+      <div class="section-label">Cyberware &amp; Special Equipment</div>
+      <p>{{ mook.cyberware_special_equipment }}</p>
+    </div>
   </section>
+
+  <footer>Cyberpunk RED // Mook Sheet // Night City</footer>
 </body>
 </html>

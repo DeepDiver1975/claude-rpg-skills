@@ -85,5 +85,8 @@ def test_fill_character_sheet_with_a_portrait_embeds_the_image(tmp_path):
 
     assert output_pdf.exists()
     reader = PdfReader(output_pdf)
-    all_images = [img for page in reader.pages for img in page.images]
-    assert len(all_images) == 1
+    # Check the first page specifically, not a document-wide count: WeasyPrint
+    # can place the image XObject in a resources dict shared across pages, so
+    # pypdf's per-page `.images` may list it on a later page too even though
+    # it's only ever painted in the header on page 1.
+    assert len(reader.pages[0].images) == 1
