@@ -122,12 +122,15 @@ Also write a Markdown version of the same character for quick reference.
 
 All keys required except `portrait_image_path`, `reputation`, and `cyberware`.
 `skills` keys must be normalized skill names present in
-`scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (57 entries covering
-the sheet's primary skill list, each mapped to the stat it rolls against) — the
-script raises an error naming any skill you use that isn't in that set, so
-treat that as a sign to pick a different/adjacent skill name rather than
-inventing one. The sheet prints each skill's LVL and its rolled TOTAL
-(stat + level) automatically — don't compute or write the total yourself.
+`scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (60 entries covering
+the sheet's primary skill list, each mapped to the stat it rolls against) or
+one of `CATEGORY_SKILLS` — "Local Expert" and "Play Instrument" are CPR "pick
+a specialization" skills, so name the specific area/instrument in parens, e.g.
+`"Local Expert (Combat Zone)"` or `"Play Instrument (Guitar)"` — the script
+raises an error naming any skill you use that isn't in either set, so treat
+that as a sign to pick a different/adjacent skill name rather than inventing
+one. The sheet prints each skill's LVL and its rolled TOTAL (stat + level)
+automatically — don't compute or write the total yourself.
 
 `reputation` defaults to 2 (CPR's starting Reputation for a new character) if
 omitted. `seriously_wounded` (Seriously Wounded Threshold) and `death_save`

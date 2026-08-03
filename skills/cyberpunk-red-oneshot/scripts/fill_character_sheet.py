@@ -47,8 +47,28 @@ SKILL_GOVERNING_STAT = {
     "Shoulder Arms": "REF", "Stealth": "DEX", "Streetwise": "COOL",
     "Tactics": "INT", "Tracking": "INT", "Trading": "COOL",
     "Wardrobe & Style": "COOL", "Wilderness Survival": "INT",
+    # These five are in the skill's own sourced free-rules list
+    # (references/cpr-rules-summary.md) but were missed when the AcroForm-era
+    # skill map was built, because the official PDF names their fields
+    # outside the "LVL<Skill> <STAT>" pattern that map was built from — see
+    # cpr-rules-summary.md:133-143 for the (self-documented) full story.
+    "Handgun": "REF", "Concentration": "WILL", "Conceal/Reveal Object": "INT",
 }
-VALID_SKILLS = set(SKILL_GOVERNING_STAT)
+
+# CPR "pick a specialization" skills: the bare skill name is meaningless
+# without naming the specific area/instrument, so these are matched by
+# prefix (e.g. "Local Expert (Combat Zone)") in addition to the bare name.
+CATEGORY_SKILLS = {"Local Expert": "INT", "Play Instrument": "TECH"}
+
+VALID_SKILLS = set(SKILL_GOVERNING_STAT) | set(CATEGORY_SKILLS)
+
+
+def _governing_stat(skill_name: str) -> str | None:
+    if skill_name in SKILL_GOVERNING_STAT:
+        return SKILL_GOVERNING_STAT[skill_name]
+    base_name = skill_name.split(" (", 1)[0]
+    return CATEGORY_SKILLS.get(base_name)
+
 
 # CPR's starting Reputation for a new character (not covered by the free
 # reference material this skill sources from — see README/SKILL.md's
@@ -67,25 +87,35 @@ def _portrait_data_uri(portrait_image_path: str | None) -> str | None:
     return data_uri(Path(portrait_image_path), mime)
 
 
-def render_character_sheet_html(character: dict) -> str:
-    """Render a character JSON dict into a self-contained HTML document string."""
-    unknown_skills = set(character["skills"]) - VALID_SKILLS
+def build_skill_rows(skills: dict[str, int], stats: dict[str, int]) -> list[dict]:
+    """Map a character's {skill name: level} dict to sorted display rows with
+    each skill's governing stat and rolled total (stat + level).
+
+    Raises ValueError naming any skill name that isn't a recognized skill or
+    a "category skill (specialization)" (e.g. "Local Expert (Combat Zone)").
+    """
+    unknown_skills = {name for name in skills if _governing_stat(name) is None}
     if unknown_skills:
         raise ValueError(
             f"skill(s) {sorted(unknown_skills)!r} not in VALID_SKILLS — "
             "add them there (Task 9) before using a sheet that uses them"
         )
 
-    stats = character["stats"]
-    skills = [
+    return [
         {
             "name": name,
-            "stat": SKILL_GOVERNING_STAT[name],
+            "stat": (stat := _governing_stat(name)),
             "level": level,
-            "total": level + stats[SKILL_GOVERNING_STAT[name]],
+            "total": level + stats[stat],
         }
-        for name, level in sorted(character["skills"].items())
+        for name, level in sorted(skills.items())
     ]
+
+
+def render_character_sheet_html(character: dict) -> str:
+    """Render a character JSON dict into a self-contained HTML document string."""
+    stats = character["stats"]
+    skills = build_skill_rows(character["skills"], stats)
 
     template = _ENV.get_template("character_sheet.html.jinja")
     return template.render(

@@ -62,20 +62,18 @@
 
   <section class="skills">
     <div class="section-label">Skills</div>
-    <div class="skills-table">
-      <table>
-        <thead><tr><th>Skill</th><th class="mono">LVL</th><th class="mono">TOTAL</th></tr></thead>
-        <tbody>
-          {% for skill in skills %}
-          <tr>
-            <td>{{ skill.name }} <span style="color: var(--chrome);">({{ skill.stat }})</span></td>
-            <td class="mono">{{ skill.level }}</td>
-            <td class="mono total">{{ skill.total }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <table>
+      <thead><tr><th>Skill</th><th class="mono">LVL</th><th class="mono">TOTAL</th></tr></thead>
+      <tbody>
+        {% for skill in skills %}
+        <tr>
+          <td>{{ skill.name }} <span style="color: var(--chrome);">({{ skill.stat }})</span></td>
+          <td class="mono">{{ skill.level }}</td>
+          <td class="mono total">{{ skill.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </section>
 
   <section class="weapons">

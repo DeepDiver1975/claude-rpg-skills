@@ -197,9 +197,6 @@ th {
 td.mono, th.mono { font-family: "JetBrains Mono", monospace; }
 td.total { color: var(--circuit); font-weight: 700; }
 
-.skills-table { column-count: 2; column-gap: 16pt; }
-.skills-table table { break-inside: avoid; }
-
 /* Free text blocks */
 .freetext-block { margin-top: 9pt; break-inside: avoid; }
 .freetext-block p { margin: 0; white-space: pre-wrap; }

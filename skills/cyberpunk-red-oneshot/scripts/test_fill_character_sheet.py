@@ -6,7 +6,7 @@ import pytest
 from PIL import Image
 from pypdf import PdfReader
 
-from fill_character_sheet import fill_character_sheet, render_character_sheet_html
+from fill_character_sheet import build_skill_rows, fill_character_sheet, render_character_sheet_html
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 FIXTURE = SKILL_DIR / "scripts" / "fixtures" / "sample_character.json"
@@ -57,6 +57,38 @@ def test_render_character_sheet_html_without_portrait_has_no_img_tag():
     character["portrait_image_path"] = None
     html = render_character_sheet_html(character)
     assert "<img" not in html
+
+
+def test_previously_missing_free_source_skills_are_now_valid():
+    # Handgun, Concentration, and Conceal/Reveal Object are all in the skill's
+    # own sourced free-rules list (references/cpr-rules-summary.md) but were
+    # never added to the AcroForm-era skill map because the official PDF names
+    # their fields outside the "LVL<Skill> <STAT>" pattern the map was built
+    # from (documented as an open TODO in cpr-rules-summary.md:133-143).
+    character = _character()
+    character["skills"] = {"Handgun": 5, "Concentration": 2, "Conceal/Reveal Object": 3}
+    html = render_character_sheet_html(character)
+    assert "Handgun" in html and "Concentration" in html
+
+
+def test_category_skills_accept_a_named_specialization():
+    # Local Expert and Play Instrument are CPR "pick a specialization" skills
+    # — a bare "Local Expert" is meaningless without naming the area/instrument.
+    character = _character()
+    character["skills"] = {
+        "Local Expert (Combat Zone)": 4,
+        "Play Instrument (Guitar)": 3,
+    }
+    stats = character["stats"]
+    skills = {s["name"]: s for s in build_skill_rows(character["skills"], stats)}
+    assert skills["Local Expert (Combat Zone)"]["total"] == 4 + stats["INT"]
+    assert skills["Play Instrument (Guitar)"]["total"] == 3 + stats["TECH"]
+
+
+def test_category_skill_without_specialization_still_valid():
+    character = _character()
+    character["skills"] = {"Local Expert": 4}
+    render_character_sheet_html(character)  # must not raise
 
 
 def test_fill_character_sheet_produces_a_readable_pdf_with_correct_values(tmp_path):
