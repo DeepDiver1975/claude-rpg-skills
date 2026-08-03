@@ -89,7 +89,7 @@ a lifepath-flavored German background tied to the crew concept and to the
 scenario, and a portrait image prompt built from the GM's selected style preset
 (Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
 Additions". Save the portrait prompt now, before continuing, to
-`<output-folder>/image-prompts/portrait-<handle-slug>.txt` — Step 8's
+`<output-folder>/images/portrait-<handle-slug>.txt` — Step 8's
 consolidated pass still accounts for it, but the file has to exist at this
 point in the run for the optional generation step below.
 
@@ -97,7 +97,7 @@ If `generate_images` is `true` (Step 1), generate the portrait now, before
 filling the PDF:
 
 ```bash
-python3 scripts/generate_image.py <output-folder>/image-prompts/portrait-<handle-slug>.txt <output-folder>/image-prompts/portrait-<handle-slug>.png
+python3 scripts/generate_image.py <output-folder>/images/portrait-<handle-slug>.txt <output-folder>/images/portrait-<handle-slug>.png
 ```
 
 If this fails, report the reason (the script prints a clear message to
@@ -224,26 +224,26 @@ plot (general district geography, well-known public landmarks, and the
 crew's own starting location) — see "Map-Specific Additions" in the style
 guide, now split into a "GM Map" and "Player Map" subsection, for exactly
 what each may and may not show. Save all prompts into
-`<output-folder>/image-prompts/`, one file per image (the two maps as
+`<output-folder>/images/`, one file per image (the two maps as
 `map-gm.txt` and `map-player.txt`), each labeled with the German
 name/scene it belongs to, since these are normally meant to be run through
 the GM's own external image tool — or, if the GM opted into automatic
 generation back in Step 1, generated directly by this skill in the pass
 described below. After writing both map prompts, add two
 lines to the GM guide directly below its premise section: "**Regionale
-Karte (GM, mit Spoilern):** siehe `image-prompts/map-gm.txt`" and
+Karte (GM, mit Spoilern):** siehe `images/map-gm.txt`" and
 "**Regionale Karte (Spieler:innen, spoilerfrei — direkt am Tisch
-zeigbar):** siehe `image-prompts/map-player.txt`" — matching how NPC
+zeigbar):** siehe `images/map-player.txt`" — matching how NPC
 blocks already point to their own image-prompt file.
 
 If `generate_images` was set to `true` in Step 1, after every prompt file
 above has been written, generate the remaining images in one consolidated
-pass: for every `.txt` file in `<output-folder>/image-prompts/` that
+pass: for every `.txt` file in `<output-folder>/images/` that
 doesn't already have a same-named `.png` next to it (the portrait files
 handled back in Step 5 already do), run:
 
 ```bash
-python3 scripts/generate_image.py <output-folder>/image-prompts/<name>.txt <output-folder>/image-prompts/<name>.png
+python3 scripts/generate_image.py <output-folder>/images/<name>.txt <output-folder>/images/<name>.png
 ```
 
 Report each failure individually (which file, and the reason
@@ -259,8 +259,8 @@ below.
 Write everything into a fresh dated folder: `oneshots/YYYY-MM-DD-<slug>/`
 containing: character PDFs + Markdown, the GM guide (German — the single
 scenario-plus-GM-notes document from Step 6, closed out with Step 10's gaps
-section), Mook Sheet PDFs, and `image-prompts/`. If image auto-generation
-was enabled in Step 1, `image-prompts/` also contains a same-named `.png`
+section), Mook Sheet PDFs, and `images/`. If image auto-generation
+was enabled in Step 1, `images/` also contains a same-named `.png`
 file next to each `.txt` prompt it produced. If any PDF fill step
 fails, report the failing field name and fall back to delivering that
 character's Markdown sheet only — never silently ship an incomplete PDF without
