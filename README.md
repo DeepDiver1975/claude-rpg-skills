@@ -12,20 +12,28 @@ tooling. Each skill lives in its own self-contained subdirectory under
 | [`cyberpunk-red-oneshot`](skills/cyberpunk-red-oneshot/README.md) | Generates a complete Cyberpunk RED one-shot: pregenerated characters as filled official PDF sheets, a scenario with GM notes, NPC/enemy stat blocks, and image-generation prompts. |
 | [`dnd-5e-oneshot`](skills/dnd-5e-oneshot/README.md) | Generates a complete D&D 5e (2024 rules / SRD 5.2.1) one-shot: pregenerated characters as filled official PDF sheets, a scenario with GM notes, NPC/monster Markdown stat blocks, and image-generation prompts. |
 
-## Using a skill
+## Installing via the Claude Code plugin marketplace
 
-Copy or symlink the skill's subdirectory into your Claude Code skills
-directory:
+```
+/plugin marketplace add DeepDiver1975/claude-rpg-skills
+/plugin install claude-rpg-skills
+```
+
+This installs both skills at once. See each skill's own README for setup
+requirements — some skills need external assets (fonts, official PDFs, etc.)
+that aren't bundled here because of the source game's licensing terms; check
+the skill's README before assuming copy-and-go.
+
+## Using a skill manually
+
+Alternatively, copy or symlink the skill's subdirectory into your Claude Code
+skills directory — useful for local development or working from a fork:
 
 ```bash
 ln -s "$(pwd)/skills/<skill-name>" ~/.claude/skills/<skill-name>
 ```
 
-Then invoke it in Claude Code (e.g. `/cyberpunk-red-oneshot`). See each
-skill's own README for setup requirements — some skills need external assets
-(fonts, official PDFs, etc.) that aren't bundled here because of the source
-game's licensing terms; check the skill's README before assuming
-copy-and-go.
+Then invoke it in Claude Code (e.g. `/cyberpunk-red-oneshot`).
 
 ## Licensing note
 
