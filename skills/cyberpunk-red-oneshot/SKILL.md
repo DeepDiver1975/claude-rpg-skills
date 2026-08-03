@@ -6,12 +6,13 @@ description: Use when the user wants to run a Cyberpunk RED one-shot session (a 
 # Cyberpunk RED One-Shot Generator
 
 Generates a complete, ready-to-run Cyberpunk RED one-shot for a 3-5 player group:
-pregenerated Rank 0 characters as filled official PDF sheets (with portraits) plus
-Markdown, a linear scenario with GM notes, NPC/enemy Mook Sheets, and a consistent
+pregenerated Rank 0 characters as original character sheet PDFs (with portraits)
+plus Markdown, a linear scenario with GM notes, NPC/enemy Mook Sheets, and a consistent
 set of image prompts. The GM plays this in German; every deliverable this skill
 writes for players/GM must be German, with three exceptions: this document and
-all `references/*` stay English; Role names (Solo, Netrunner, ...) and PDF field
-labels stay in their original English CPR form even inside German text; and the
+all `references/*` stay English; Role names (Solo, Netrunner, ...) and character/
+Mook sheet section labels stay in their original English CPR form even inside
+German text; and the
 image prompts written in Step 8 stay English (image-generation tools expect
 English prompts), each one labeled with the German name/scene it belongs to.
 
@@ -120,10 +121,10 @@ Also write a Markdown version of the same character for quick reference.
 ### Character JSON Schema
 
 All keys required except `portrait_image_path`. `skills` keys must be normalized
-skill names present in `assets/skills_field_map.json` (57 entries covering the
-sheet's primary skill list) — the script raises an error naming any skill you use
-that isn't in that map, so treat that as a sign to pick a different/adjacent skill
-name rather than inventing a field.
+skill names present in `scripts/fill_character_sheet.py`'s `VALID_SKILLS` (57
+entries covering the sheet's primary skill list) — the script raises an error
+naming any skill you use that isn't in that set, so treat that as a sign to pick
+a different/adjacent skill name rather than inventing one.
 
 ```json
 {
@@ -144,22 +145,6 @@ name rather than inventing a field.
   "portrait_image_path": "optional/path/to/portrait.png, or null"
 }
 ```
-
-Known constraint: the sheet's text fields do not auto-shrink, so a value that is
-too long for its printed box is silently clipped in the rendered PDF (the stored
-data stays correct — only the print is cut off). Keep `handle` to roughly 18
-characters and `role_ability` to roughly 11 (e.g. "Combat Awareness" prints as
-"Combat Awar"); wide or all-caps text clips even sooner, and German text tends to
-run longer than English, so lean toward brevity.
-
-Known constraint: umlauts (ä/ö/ü) in `weapons[].name`, `weapons[].notes`,
-`fashion`, and `role_specific_lifepath` render correctly in mupdf-family viewers
-(mutool, zathura) but may render as blank/mangled in poppler-based viewers
-(evince, Okular) — a font-encoding limitation baked into the official PDF's
-per-field widget resources, not something this skill's fill step can fix. The
-stored field data is always correct regardless of viewer; only some renderers
-mis-display it. Mention this to the GM if they use evince/Okular and see garbled
-weapon names or fashion text.
 
 ## Step 6: Generate the scenario as the GM guide
 
@@ -189,7 +174,7 @@ no portrait-specific additions needed unless it's a portrait-framed NPC image).
 ### Mook JSON Schema
 
 All fields required except `weapons` entries beyond the first, which may be
-omitted (the sheet has 4 weapon slots; unused ones are simply left blank).
+omitted — the sheet's weapon table grows to fit however many entries you give it.
 
 ```json
 {
@@ -241,8 +226,8 @@ GM guide (German — the single scenario-plus-GM-notes document from Step 6, clo
 out with Step 10's gaps section) at the folder root, and an `image-prompts/`
 subfolder. When a document in a subfolder points at a file in another subfolder,
 use a correct relative path (e.g. the GM guide at the root links `npcs/…` and
-`image-prompts/…`; an NPC file under `npcs/` links `../image-prompts/…`). If any PDF fill step
-fails, report the failing field name and fall back to delivering that
+`image-prompts/…`; an NPC file under `npcs/` links `../image-prompts/…`). If any PDF render step
+fails, report the error and fall back to delivering that
 character's Markdown sheet only — never silently ship an incomplete PDF without
 saying so.
 

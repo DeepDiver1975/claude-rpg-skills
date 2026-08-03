@@ -1,41 +1,35 @@
 #!/usr/bin/env python3
-"""Fill an official Cyberpunk RED Mook Sheet PDF from an NPC/enemy JSON file."""
+"""Render a Cyberpunk RED Mook Sheet PDF from an NPC/enemy JSON file."""
 import argparse
 import json
 from pathlib import Path
 
-from pdf_form import fill_text_fields
+import jinja2
+
+from render_pdf import load_css_with_fonts, render_html_to_pdf
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
-BLANK_SHEET = SKILL_DIR / "assets" / "RTG-CPR-MooksSheetFormFillable.pdf"
+ASSETS_DIR = SKILL_DIR / "assets"
+
+_ENV = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(ASSETS_DIR),
+    autoescape=jinja2.select_autoescape(["html", "jinja"]),
+)
 
 
-def build_field_values(mook: dict) -> dict[str, str]:
-    values: dict[str, str] = {
-        "Name": mook["name"],
-        "Hit Points": str(mook["hit_points"]),
-        "Seriously Wounded": str(mook["seriously_wounded"]),
-        "Death Save": str(mook["death_save"]),
-        "Skill Bases": mook["skill_bases"],
-        "Armor Type": mook["armor_type"],
-        "Head SP": str(mook["head_sp"]),
-        "Body SP": str(mook["body_sp"]),
-        "Cyberware & Special Equipment": mook["cyberware_special_equipment"],
-    }
-    for stat_name, stat_value in mook["stats"].items():
-        values[stat_name] = str(stat_value)
-
-    for i, weapon in enumerate(mook["weapons"], start=1):
-        values[f"Weapon {i}"] = weapon["name"]
-        values[f"Damage {i}"] = weapon["damage"]
-
-    return values
+def render_mook_sheet_html(mook: dict) -> str:
+    """Render a mook JSON dict into a self-contained HTML document string."""
+    template = _ENV.get_template("mook_sheet.html.jinja")
+    return template.render(
+        mook=mook,
+        css=load_css_with_fonts(ASSETS_DIR / "mook_sheet.css", ASSETS_DIR / "fonts"),
+    )
 
 
 def fill_mook_sheet(mook_json_path: Path, output_pdf: Path) -> None:
     mook = json.loads(Path(mook_json_path).read_text(encoding="utf-8"))
-    values = build_field_values(mook)
-    fill_text_fields(BLANK_SHEET, output_pdf, values)
+    html = render_mook_sheet_html(mook)
+    render_html_to_pdf(html, output_pdf)
 
 
 def main() -> None:

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>{{ mook.name }}</title>
+<style>{{ css | safe }}</style>
+</head>
+<body>
+  <header class="sheet-header">
+    <h1 class="name">{{ mook.name }}</h1>
+    <div class="trackers">
+      <div class="tracker">
+        <span class="tracker-label">HP</span>
+        <span class="tracker-value">{{ mook.hit_points }}</span>
+      </div>
+      <div class="tracker">
+        <span class="tracker-label">Seriously Wounded</span>
+        <span class="tracker-value">{{ mook.seriously_wounded }}</span>
+      </div>
+      <div class="tracker">
+        <span class="tracker-label">Death Save</span>
+        <span class="tracker-value">{{ mook.death_save }}</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="stats">
+    <h2>Attribute</h2>
+    <div class="stats-grid">
+      {% for stat_name, stat_value in mook.stats.items() %}
+      <div class="stat-box">
+        <span class="stat-name">{{ stat_name }}</span>
+        <span class="stat-value">{{ stat_value }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="skill-bases">
+    <h2>Skill Bases</h2>
+    <p>{{ mook.skill_bases }}</p>
+  </section>
+
+  <section class="weapons">
+    <h2>Waffen</h2>
+    <table>
+      <thead><tr><th>Waffe</th><th>Schaden</th></tr></thead>
+      <tbody>
+        {% for weapon in mook.weapons %}
+        <tr><td>{{ weapon.name }}</td><td>{{ weapon.damage }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="armor">
+    <h2>Rüstung</h2>
+    <table>
+      <thead><tr><th>Typ</th><th>Kopf SP</th><th>Körper SP</th></tr></thead>
+      <tbody>
+        <tr><td>{{ mook.armor_type }}</td><td>{{ mook.head_sp }}</td><td>{{ mook.body_sp }}</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="freetext">
+    <h2>Cyberware &amp; Sonderausrüstung</h2>
+    <p>{{ mook.cyberware_special_equipment }}</p>
+  </section>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>{{ character.handle }}</title>
+<style>{{ css | safe }}</style>
+</head>
+<body>
+  <header class="sheet-header">
+    <div class="identity">
+      <h1 class="handle">{{ character.handle }}</h1>
+      <div class="role-line">
+        <span class="role">{{ character.role }}</span>
+        <span class="role-ability">{{ character.role_ability }} (Rang {{ character.role_ability_rank }})</span>
+      </div>
+    </div>
+    {% if portrait_data_uri %}
+    <div class="portrait-box">
+      <img class="portrait" src="{{ portrait_data_uri }}" alt="Portrait von {{ character.handle }}">
+    </div>
+    {% endif %}
+  </header>
+
+  <section class="trackers">
+    <div class="tracker">
+      <span class="tracker-label">Trefferpunkte</span>
+      <span class="tracker-value">{{ character.hp.current }} / {{ character.hp.max }}</span>
+    </div>
+    <div class="tracker">
+      <span class="tracker-label">Humanity</span>
+      <span class="tracker-value">{{ character.humanity.current }} / {{ character.humanity.max }}</span>
+    </div>
+    <div class="tracker">
+      <span class="tracker-label">Luck Points</span>
+      <span class="tracker-value">{{ character.luck.current }} / {{ character.luck.max }}</span>
+    </div>
+  </section>
+
+  <section class="stats">
+    <h2>Attribute</h2>
+    <div class="stats-grid">
+      {% for stat_name, stat_value in character.stats.items() %}
+      <div class="stat-box">
+        <span class="stat-name">{{ stat_name }}</span>
+        <span class="stat-value">{{ stat_value }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="skills">
+    <h2>Skills</h2>
+    <div class="skills-grid">
+      {% for skill_name, level in character.skills.items() | sort %}
+      <div class="skill-row">
+        <span class="skill-name">{{ skill_name }}</span>
+        <span class="skill-level">{{ level }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="weapons">
+    <h2>Waffen</h2>
+    <table>
+      <thead>
+        <tr><th>Waffe</th><th>Schaden</th><th>Munition</th><th>ROF</th><th>Notizen</th></tr>
+      </thead>
+      <tbody>
+        {% for weapon in character.weapons %}
+        <tr>
+          <td>{{ weapon.name }}</td>
+          <td>{{ weapon.dmg }}</td>
+          <td>{{ weapon.ammo }}</td>
+          <td>{{ weapon.rof }}</td>
+          <td>{{ weapon.notes }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="armor">
+    <h2>Rüstung</h2>
+    <table>
+      <thead>
+        <tr><th></th><th>SP</th><th>Penalty</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Kopf</td><td>{{ character.armor.head.sp }}</td><td>{{ character.armor.head.penalty }}</td></tr>
+        <tr><td>Körper</td><td>{{ character.armor.body.sp }}</td><td>{{ character.armor.body.penalty }}</td></tr>
+        <tr><td>Schild</td><td>{{ character.armor.shield.sp }}</td><td>{{ character.armor.shield.penalty }}</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="freetext">
+    <div class="freetext-block">
+      <h2>Style</h2>
+      <p>{{ character.fashion }}</p>
+    </div>
+    <div class="freetext-block">
+      <h2>Lifepath</h2>
+      <p>{{ character.role_specific_lifepath }}</p>
+    </div>
+    <div class="freetext-block">
+      <h2>Notizen</h2>
+      <p>{{ character.notes }}</p>
+    </div>
+  </section>
+</body>
+</html>
