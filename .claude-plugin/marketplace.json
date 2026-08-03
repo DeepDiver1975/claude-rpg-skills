@@ -1,0 +1,12 @@
+{
+  "name": "claude-rpg-skills",
+  "description": "Claude Code skills for tabletop RPG session prep and one-shot generation.",
+  "owner": { "name": "DeepDiver1975", "url": "https://github.com/DeepDiver1975" },
+  "plugins": [
+    {
+      "name": "claude-rpg-skills",
+      "description": "Claude Code skills for tabletop RPG session prep and one-shot generation.",
+      "source": "./"
+    }
+  ]
+}
