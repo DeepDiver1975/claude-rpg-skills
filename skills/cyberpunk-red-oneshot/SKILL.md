@@ -35,6 +35,21 @@ rough theme/tone (e.g. "corporate extraction gone wrong", "gang turf war"), and
 optionally a specific edge/twist. If the premise is ambiguous, ask ONE clarifying
 question rather than guessing a tone that might clash with the table.
 
+Also check whether the environment has `GEMINI_API_KEY` or `GOOGLE_API_KEY`
+set (e.g. `printenv GEMINI_API_KEY GOOGLE_API_KEY` — either being
+non-empty is enough). If neither is set, skip this and move on to Step 2 —
+don't ask the GM about image generation when they have no key to act on it
+with. If one is set, ask one more question: whether to auto-generate this
+run's image prompts as actual PNG files via the Google Gemini image API,
+in addition to always writing them as `.txt` files as before. Mention this
+calls a paid, per-image API (real money, no free tier assumed), and that a
+typical one-shot generates roughly one image per PC portrait, one or two
+per major NPC and key location, 1-2 battlemaps, plus 2 regional maps —
+usually in the low-to-mid teens total. Record the answer as
+`generate_images` for the rest of this run (default `false` — the
+original prompts-only behavior — if the GM declines or no key is
+configured).
+
 ## Step 2: Pick a visual style
 
 Ask the GM which visual style preset from `references/style-guide.md` to use
@@ -68,8 +83,27 @@ For each PC, using `references/cpr-rules-summary.md` (stats/skills/DVs) and
 a lifepath-flavored German background tied to the crew concept and to the
 scenario, and a portrait image prompt built from the GM's selected style preset
 (Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
-Additions". Assemble a character JSON matching the **Character JSON Schema**
-below, write it to the run's output folder, then run:
+Additions". Save the portrait prompt now, before continuing, to
+`<output-folder>/image-prompts/portrait-<handle-slug>.txt` — Step 8's
+consolidated pass still accounts for it, but the file has to exist at this
+point in the run for the optional generation step below.
+
+If `generate_images` is `true` (Step 1), generate the portrait now, before
+filling the PDF:
+
+```bash
+python3 scripts/generate_image.py <output-folder>/image-prompts/portrait-<handle-slug>.txt <output-folder>/image-prompts/portrait-<handle-slug>.png
+```
+
+If this fails, report the reason (the script prints a clear message to
+stderr — missing key, API error, safety-filter rejection, quota) and
+continue with this PC's `portrait_image_path` left `null`; a missing
+portrait is never a reason to stop generating the rest of the one-shot.
+
+Assemble a character JSON matching the **Character JSON Schema**
+below — setting `portrait_image_path` to the PNG path above if it was
+generated, or leaving it `null` otherwise — write it to the run's output
+folder, then run:
 
 ```bash
 python3 scripts/fill_character_sheet.py <character.json> <output-folder>/<handle-slug>.pdf
@@ -187,20 +221,42 @@ guide, now split into a "GM Map" and "Player Map" subsection, for exactly
 what each may and may not show. Save all prompts into
 `<output-folder>/image-prompts/`, one file per image (the two maps as
 `map-gm.txt` and `map-player.txt`), each labeled with the German
-name/scene it belongs to, since these are meant to be run through the
-GM's own external image tool. After writing both map prompts, add two
+name/scene it belongs to, since these are normally meant to be run through
+the GM's own external image tool — or, if the GM opted into automatic
+generation back in Step 1, generated directly by this skill in the pass
+described below. After writing both map prompts, add two
 lines to the GM guide directly below its premise section: "**Regionale
 Karte (GM, mit Spoilern):** siehe `image-prompts/map-gm.txt`" and
 "**Regionale Karte (Spieler:innen, spoilerfrei — direkt am Tisch
 zeigbar):** siehe `image-prompts/map-player.txt`" — matching how NPC
 blocks already point to their own image-prompt file.
 
+If `generate_images` was set to `true` in Step 1, after every prompt file
+above has been written, generate the remaining images in one consolidated
+pass: for every `.txt` file in `<output-folder>/image-prompts/` that
+doesn't already have a same-named `.png` next to it (the portrait files
+handled back in Step 5 already do), run:
+
+```bash
+python3 scripts/generate_image.py <output-folder>/image-prompts/<name>.txt <output-folder>/image-prompts/<name>.png
+```
+
+Report each failure individually (which file, and the reason
+`generate_image.py` printed to stderr — missing key, API error,
+safety-filter rejection, quota) and keep going with the rest — a failed
+image never blocks the rest of the one-shot's deliverables, since its
+`.txt` prompt is always still there as a manual fallback, matching the
+"never silently ship an incomplete PDF without saying so" discipline
+below.
+
 ## Step 9: Assemble the output folder
 
 Write everything into a fresh dated folder: `oneshots/YYYY-MM-DD-<slug>/`
 containing: character PDFs + Markdown, the GM guide (German — the single
 scenario-plus-GM-notes document from Step 6, closed out with Step 10's gaps
-section), Mook Sheet PDFs, and `image-prompts/`. If any PDF fill step
+section), Mook Sheet PDFs, and `image-prompts/`. If image auto-generation
+was enabled in Step 1, `image-prompts/` also contains a same-named `.png`
+file next to each `.txt` prompt it produced. If any PDF fill step
 fails, report the failing field name and fall back to delivering that
 character's Markdown sheet only — never silently ship an incomplete PDF without
 saying so.
