@@ -70,14 +70,16 @@ those prompts instead:
 2. Set your own Gemini API key — get one from
    [Google AI Studio](https://aistudio.google.com/apikey) — as either the
    `GEMINI_API_KEY` or `GOOGLE_API_KEY` environment variable, **or** in a
-   `.env` file at this skill's own root (i.e. next to this README, not
-   inside `scripts/`): `echo 'GEMINI_API_KEY=your-key-here' > .env`. This
-   file is already covered by `.gitignore`, so it won't be committed by
-   accident, and `scripts/generate_image.py` reads it directly — no need
-   to `export` anything into your shell. A real environment variable
-   always takes precedence over the `.env` file if both are set. This
-   calls a paid, per-image API; nothing here manages billing or spending
-   limits for you.
+   `.env` file in your project's root directory — wherever you run `claude`
+   from (**not** inside the skill's own installed folder under
+   `~/.claude/skills/`, which is often a shared symlink and a bad place for
+   a per-project secret): `echo 'GEMINI_API_KEY=your-key-here' > .env`.
+   Make sure your project's `.gitignore` excludes `.env` so it's never
+   committed by accident, and `scripts/generate_image.py` reads it
+   directly — no need to `export` anything into your shell. A real
+   environment variable always takes precedence over the `.env` file if
+   both are set. This calls a paid, per-image API; nothing here manages
+   billing or spending limits for you.
 3. When you run the skill, if a key is available (either way) it will ask
    you once, near the start of the run, whether to auto-generate images
    for this one-shot. Answer no (or leave no key configured) to keep the

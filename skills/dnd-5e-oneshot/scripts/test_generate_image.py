@@ -162,6 +162,10 @@ def test_generate_image_bytes_picks_up_the_key_from_a_dotenv_file(tmp_path, monk
     assert os.environ["GEMINI_API_KEY"] == "from-dotenv-file"
 
 
+def test_dotenv_path_defaults_to_a_dotenv_file_in_the_current_working_directory():
+    assert generate_image_module.DOTENV_PATH == Path.cwd() / ".env"
+
+
 def test_help_works_without_google_genai_installed(monkeypatch):
     # Guards the lazy-import design: argument parsing must not require
     # google.genai to be importable — --help has to work pre-`pip install`.

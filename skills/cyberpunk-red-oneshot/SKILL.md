@@ -37,11 +37,12 @@ question rather than guessing a tone that might clash with the table.
 
 Also check whether `GEMINI_API_KEY` or `GOOGLE_API_KEY` is available,
 either as a real environment variable (e.g. `printenv GEMINI_API_KEY
-GOOGLE_API_KEY` — either being non-empty is enough) or in a `.env` file at
-this skill's root (`<skill-dir>/.env`, e.g. `grep -E
-'GEMINI_API_KEY|GOOGLE_API_KEY' <skill-dir>/.env` — `scripts/generate_image.py`
-reads this file itself, so its mere presence with either key is enough,
-you don't need to export it into the shell). If neither is set anywhere,
+GOOGLE_API_KEY` — either being non-empty is enough) or in a `.env` file in
+the project root — the directory you started Claude Code in (e.g. `grep -E
+'GEMINI_API_KEY|GOOGLE_API_KEY' .env` run from there — `scripts/generate_image.py`
+reads this file itself from its current working directory, so its mere
+presence there with either key is enough, you don't need to export it into
+the shell). If neither is set anywhere,
 skip this and move on to Step 2 — don't ask the GM about image generation
 when they have no key to act on it with. If one is set, ask one more
 question: whether to auto-generate this

@@ -5,8 +5,7 @@ import os
 import sys
 from pathlib import Path
 
-SKILL_DIR = Path(__file__).resolve().parent.parent
-DOTENV_PATH = SKILL_DIR / ".env"
+DOTENV_PATH = Path.cwd() / ".env"
 
 # Re-verify against current Gemini API docs before relying on this — the
 # API surface moves fast (imagen-4.0-generate-001, an earlier choice for
