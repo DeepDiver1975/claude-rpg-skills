@@ -35,11 +35,16 @@ rough theme/tone (e.g. "corporate extraction gone wrong", "gang turf war"), and
 optionally a specific edge/twist. If the premise is ambiguous, ask ONE clarifying
 question rather than guessing a tone that might clash with the table.
 
-Also check whether the environment has `GEMINI_API_KEY` or `GOOGLE_API_KEY`
-set (e.g. `printenv GEMINI_API_KEY GOOGLE_API_KEY` — either being
-non-empty is enough). If neither is set, skip this and move on to Step 2 —
-don't ask the GM about image generation when they have no key to act on it
-with. If one is set, ask one more question: whether to auto-generate this
+Also check whether `GEMINI_API_KEY` or `GOOGLE_API_KEY` is available,
+either as a real environment variable (e.g. `printenv GEMINI_API_KEY
+GOOGLE_API_KEY` — either being non-empty is enough) or in a `.env` file at
+this skill's root (`<skill-dir>/.env`, e.g. `grep -E
+'GEMINI_API_KEY|GOOGLE_API_KEY' <skill-dir>/.env` — `scripts/generate_image.py`
+reads this file itself, so its mere presence with either key is enough,
+you don't need to export it into the shell). If neither is set anywhere,
+skip this and move on to Step 2 — don't ask the GM about image generation
+when they have no key to act on it with. If one is set, ask one more
+question: whether to auto-generate this
 run's image prompts as actual PNG files via the Google Gemini image API,
 in addition to always writing them as `.txt` files as before. Mention this
 calls a paid, per-image API (real money, no free tier assumed), and that a

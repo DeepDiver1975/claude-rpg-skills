@@ -67,14 +67,20 @@ the Google Gemini image API directly and save actual `.png` files next to
 those prompts instead:
 
 1. `pip install google-genai`
-2. Set the `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) environment variable to
-   your own Gemini API key — get one from
-   [Google AI Studio](https://aistudio.google.com/apikey). This calls a
-   paid, per-image API; nothing here manages billing or spending limits
-   for you.
-3. When you run the skill, if either variable is set it will ask you once,
-   near the start of the run, whether to auto-generate images for this
-   one-shot. Answer no (or leave both variables unset) to keep the
+2. Set your own Gemini API key — get one from
+   [Google AI Studio](https://aistudio.google.com/apikey) — as either the
+   `GEMINI_API_KEY` or `GOOGLE_API_KEY` environment variable, **or** in a
+   `.env` file at this skill's own root (i.e. next to this README, not
+   inside `scripts/`): `echo 'GEMINI_API_KEY=your-key-here' > .env`. This
+   file is already covered by `.gitignore`, so it won't be committed by
+   accident, and `scripts/generate_image.py` reads it directly — no need
+   to `export` anything into your shell. A real environment variable
+   always takes precedence over the `.env` file if both are set. This
+   calls a paid, per-image API; nothing here manages billing or spending
+   limits for you.
+3. When you run the skill, if a key is available (either way) it will ask
+   you once, near the start of the run, whether to auto-generate images
+   for this one-shot. Answer no (or leave no key configured) to keep the
    original prompts-only behavior.
 
 See `scripts/generate_image.py` for the script this drives, and
@@ -88,7 +94,7 @@ cd scripts
 pytest -v
 ```
 
-25 tests total. 5 of them fill and render the real Character/Mook Sheet
+29 tests total. 5 of them fill and render the real Character/Mook Sheet
 PDFs, so they'll fail until step 1 above is done — that's expected, not a
 bug. The `test_generate_image.py` tests need no setup at all (no API key,
 no `google-genai` install) since they mock the Gemini client entirely.

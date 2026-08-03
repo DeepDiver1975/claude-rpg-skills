@@ -1,3 +1,4 @@
+import os
 import sys
 import types
 from pathlib import Path
@@ -5,7 +6,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from generate_image import generate_image, generate_image_bytes, main
+import generate_image as generate_image_module
+from generate_image import _load_dotenv, generate_image, generate_image_bytes, main
 
 
 def _install_fake_genai(monkeypatch, client_instance):
@@ -102,6 +104,8 @@ def test_generate_image_raises_clearly_on_a_missing_prompt_file(tmp_path, monkey
 def test_main_exits_nonzero_with_a_clear_stderr_message_on_missing_key(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    # Isolate from whatever real skills/*/​.env might exist on the machine.
+    monkeypatch.setattr(generate_image_module, "DOTENV_PATH", tmp_path / "no-such-dir" / ".env")
     prompt_path = tmp_path / "npc-fixer.txt"
     prompt_path.write_text("a grizzled fixer, neon noir", encoding="utf-8")
     output_png = tmp_path / "npc-fixer.png"
@@ -113,6 +117,49 @@ def test_main_exits_nonzero_with_a_clear_stderr_message_on_missing_key(tmp_path,
     assert exc_info.value.code != 0
     assert "GEMINI_API_KEY" in capsys.readouterr().err
     assert not output_png.exists()
+
+
+def test_load_dotenv_sets_environment_variables_from_a_file(tmp_path, monkeypatch):
+    monkeypatch.delenv("MADE_UP_TEST_KEY", raising=False)
+    dotenv_path = tmp_path / ".env"
+    dotenv_path.write_text(
+        "# a comment\n\nMADE_UP_TEST_KEY=abc123\nQUOTED_KEY=\"has spaces\"\n",
+        encoding="utf-8",
+    )
+
+    _load_dotenv(dotenv_path)
+
+    assert os.environ["MADE_UP_TEST_KEY"] == "abc123"
+    assert os.environ["QUOTED_KEY"] == "has spaces"
+
+
+def test_load_dotenv_never_overrides_an_already_set_real_env_var(tmp_path, monkeypatch):
+    monkeypatch.setenv("MADE_UP_TEST_KEY", "real-value")
+    dotenv_path = tmp_path / ".env"
+    dotenv_path.write_text("MADE_UP_TEST_KEY=from-dotenv\n", encoding="utf-8")
+
+    _load_dotenv(dotenv_path)
+
+    assert os.environ["MADE_UP_TEST_KEY"] == "real-value"
+
+
+def test_load_dotenv_is_a_silent_noop_when_the_file_is_missing(tmp_path):
+    _load_dotenv(tmp_path / "does-not-exist" / ".env")  # must not raise
+
+
+def test_generate_image_bytes_picks_up_the_key_from_a_dotenv_file(tmp_path, monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    dotenv_path = tmp_path / ".env"
+    dotenv_path.write_text("GEMINI_API_KEY=from-dotenv-file\n", encoding="utf-8")
+    monkeypatch.setattr(generate_image_module, "DOTENV_PATH", dotenv_path)
+    client = _client_returning(b"BYTESFROMDOTENVRUN")
+    _install_fake_genai(monkeypatch, client)
+
+    result = generate_image_bytes("a prompt")
+
+    assert result == b"BYTESFROMDOTENVRUN"
+    assert os.environ["GEMINI_API_KEY"] == "from-dotenv-file"
 
 
 def test_help_works_without_google_genai_installed(monkeypatch):

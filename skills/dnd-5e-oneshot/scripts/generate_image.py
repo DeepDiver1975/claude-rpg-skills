@@ -5,6 +5,9 @@ import os
 import sys
 from pathlib import Path
 
+SKILL_DIR = Path(__file__).resolve().parent.parent
+DOTENV_PATH = SKILL_DIR / ".env"
+
 # Re-verify against current Gemini API docs before relying on this — the
 # API surface moves fast (imagen-4.0-generate-001, an earlier choice for
 # this constant, was found deprecated with a 2026-08-17 shutdown date
@@ -12,6 +15,33 @@ from pathlib import Path
 # recommended general-purpose image model as of 2026-08, but confirm that
 # still holds before trusting it blindly.
 DEFAULT_MODEL = "gemini-3.1-flash-image"
+
+
+def _load_dotenv(path: Path) -> None:
+    """Load KEY=VALUE lines from a .env file into os.environ, if it exists.
+
+    Minimal by design (this repo stays stdlib-only except for google-genai
+    itself, so no python-dotenv dependency) — a real environment variable
+    always wins over a .env value (os.environ.setdefault), comments (#)
+    and blank lines are skipped, and a missing file is a silent no-op.
+    Matching single/double quotes around a value are stripped.
+    """
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return
+
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        if key:
+            os.environ.setdefault(key, value)
 
 
 def generate_image_bytes(prompt_text: str, model: str = DEFAULT_MODEL) -> bytes:
@@ -25,10 +55,12 @@ def generate_image_bytes(prompt_text: str, model: str = DEFAULT_MODEL) -> bytes:
     if not prompt_text.strip():
         raise RuntimeError("prompt file is empty — nothing to send to Gemini")
 
+    _load_dotenv(DOTENV_PATH)
     if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")):
         raise RuntimeError(
-            "no GEMINI_API_KEY or GOOGLE_API_KEY environment variable set — "
-            "image auto-generation requires one of these"
+            "no GEMINI_API_KEY or GOOGLE_API_KEY environment variable set (checked "
+            f"the real environment and {DOTENV_PATH}) — image auto-generation "
+            "requires one of these"
         )
 
     try:
