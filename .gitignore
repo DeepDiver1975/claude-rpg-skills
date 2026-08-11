@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
+# Locally-extracted core-rulebook data (copyright — derived from a paid book;
+# never commit or redistribute). Produced by scripts/extract_rules.py.
+skills/cyberpunk-red-oneshot/data/
+
 .claude
 .env
 oneshots

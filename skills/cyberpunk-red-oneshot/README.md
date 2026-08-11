@@ -40,14 +40,40 @@ directly:
 - `assets/RTG-CPR-CharacterSheet-Fillable.pdf`
 - `assets/RTG-CPR-MooksSheetFormFillable.pdf`
 
-### 2. Install requirements
+### 2. (Optional) Extract data from your own core rulebook
+
+By default the skill uses only the free Easy Mode rules, so many values (Role
+Abilities, several skill stats, all weapon/armor/gear numbers) are estimated and
+flagged in each generated GM guide. **If you own the Cyberpunk RED core rulebook**,
+you can replace those estimates with verified values from your own PDF:
+
+```bash
+# place your owned PDF here (gitignored — never committed):
+cp /path/to/your/core-rulebook.pdf assets/cpr-corebook.pdf
+python3 scripts/extract_rules.py assets/cpr-corebook.pdf --all
+```
+
+This writes page-ranged raw text to `data/raw/`; the skill then structures it into
+`data/*.json` (schema in `references/extraction-map.md`) and prefers those verified
+datasets automatically, collapsing the "Vor dem Spiel prüfen" gap list.
+
+**This is strictly local.** Your PDF and everything under `data/` are derived from a
+paid book — they are gitignored and must never be committed or shared. The
+extraction tool refuses to write anywhere outside `data/`. Only use this with a book
+you own; the repository ships only the extraction tooling and a facts-only page map,
+never R. Talsorian's content. `pdftotext`/`pdfinfo` (from `poppler-utils`) are
+required for extraction.
+
+### 3. Install requirements
 
 - `pdftk` — PDF form filling
 - ImageMagick (`magick`/`convert`) — portrait image compositing
 - `mutool` (from `mupdf-tools`) — used by the test suite to verify rendering
+- `pdftotext`/`pdfinfo` (from `poppler-utils`) — used by the optional rulebook
+  extraction in step 2
 - Python 3 and `pytest` (stdlib only otherwise — no PyPI packages required)
 
-### 3. Install the skill
+### 4. Install the skill
 
 ```bash
 ln -s "$(pwd)/skills/cyberpunk-red-oneshot" ~/.claude/skills/cyberpunk-red-oneshot
@@ -62,9 +88,11 @@ cd scripts
 pytest -v
 ```
 
-14 tests total. 5 of them fill and render the real Character/Mook Sheet
-PDFs, so they'll fail until step 1 above is done — that's expected, not a
-bug.
+25 tests total. The Character/Mook Sheet tests read, fill, and render the
+real sheet PDFs, so they'll fail until step 1 above is done — that's
+expected, not a bug. The rulebook-extraction tests run without any PDF; their
+one real-PDF integration test skips cleanly unless you've placed
+`assets/cpr-corebook.pdf` (step 2 above).
 
 ## License
 
