@@ -28,6 +28,35 @@ name, or gang name in Steps 3, 5, and 7, ask: "does this character/place have
 an explicit, stated reason to carry this name's language/culture?" If not,
 default to English.
 
+## Step 0: Use locally-extracted rulebook data if present (optional, one-time)
+
+By default this skill draws game data from the free Easy Mode references only, so
+Role Abilities, many skill→STAT mappings, and all weapon/armor/gear numbers are
+estimated and get flagged in Step 10. A GM who **owns the Cyberpunk RED core
+rulebook** can replace those estimates with verified values extracted from their
+own PDF. This is one-time setup; once `data/*.json` exist, every future run reuses
+them.
+
+**Copyright:** the GM's PDF and everything the extraction writes under `data/` are
+derived from a paid book — they are local only, gitignored, and must never be
+committed or redistributed. `scripts/extract_rules.py` refuses to write outside
+`data/`. Only use this with a book the GM owns.
+
+At the start of a run, check whether `data/` holds structured datasets:
+
+- **If `data/<domain>.json` files exist**, prefer them as verified sources
+  throughout (Steps 4, 5, 7) and treat their domains as covered in Step 10.
+- **If they do not exist**, offer the GM the one-time extraction, then fall back to
+  the free-source `references/*.md` (current behaviour) if they decline:
+  1. GM places their owned PDF at `assets/cpr-corebook.pdf` (never committed).
+  2. Run `python3 scripts/extract_rules.py assets/cpr-corebook.pdf --all` to fill
+     `data/raw/`.
+  3. For each `data/raw/<section>.txt`, read it and write the corresponding
+     `data/<domain>.json` following the schema in
+     `references/extraction-map.md` — same verified/estimated honesty as the
+     references, but every value now sourced from the book (tag each file's
+     `"_source"` as `"Cyberpunk RED core rulebook (locally extracted)"`).
+
 ## Step 1: Get the premise from the GM
 
 Ask for: party size (3-5; if outside that range, confirm rather than clamp), a
@@ -58,13 +87,18 @@ Read `references/roles-and-archetypes.md`'s "Balanced Party Selection" section.
 Pick Roles sized to the party (one combat-capable, one tech/support, remaining
 slots for social/utility) fitting the premise. Only pick Netrunner if the premise
 explicitly calls for hacking (see the Netrunning gap note in
-`references/cpr-rules-summary.md`).
+`references/cpr-rules-summary.md`). If `data/roles.json` exists (Step 0), use its
+verified Role Abilities in place of the reference's five unverified ones, and
+Netrunner is no longer a hard gap — `data/netrunning.json` covers its mechanics.
 
 ## Step 5: Generate each PC
 
 For each PC, using `references/cpr-rules-summary.md` (stats/skills/DVs) and
 `references/roles-and-archetypes.md` (Role Ability) and
-`references/weapons-armor-gear.md` (starting gear): write Rank 0 stats/skills/gear,
+`references/weapons-armor-gear.md` (starting gear) — or, when Step 0's extraction
+was done, the verified `data/skills.json`, `data/roles.json`, `data/weapons.json`,
+`data/armor.json`, `data/gear.json`, and `data/cyberware.json` in preference to
+those references: write Rank 0 stats/skills/gear,
 a lifepath-flavored German background tied to the crew concept and to the
 scenario, and a portrait image prompt built from the GM's selected style preset
 (Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
@@ -139,7 +173,8 @@ section to it, not a separate file).
 ## Step 7: Generate NPC/enemy stat blocks
 
 For antagonists, build Mook JSON files matching the **Mook JSON Schema** below
-and run:
+and run (drawing weapon/armor stats from `data/weapons.json` and `data/armor.json`
+when Step 0's extraction was done, otherwise from `references/weapons-armor-gear.md`):
 
 ```bash
 python3 scripts/fill_mook_sheet.py <mook.json> <output-folder>/<name-slug>.pdf
@@ -207,8 +242,14 @@ saying so.
 
 ## Step 10: Report gaps
 
+A domain sourced from Step 0's locally-extracted `data/*.json` counts as
+**verified** — do not flag it, and where useful cite it in the GM guide as
+"Cyberpunk RED core rulebook (locally extracted)". Only report gaps for the domains
+still coming from the free references. So if extraction was done, most of the list
+below collapses; if it wasn't, flag exactly as before.
+
 If any rule, Role Ability, skill, weapon stat, armor value, or gear item used in this
-specific one-shot wasn't covered by the free reference material — flagged as
+specific one-shot wasn't covered by verified data — flagged as
 unverified/estimated anywhere in `references/cpr-rules-summary.md`,
 `references/roles-and-archetypes.md`, or `references/weapons-armor-gear.md`
 (which is almost entirely estimated — check it as carefully as the other two) —
