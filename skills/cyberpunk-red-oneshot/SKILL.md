@@ -120,7 +120,8 @@ Also write a Markdown version of the same character for quick reference.
 
 ### Character JSON Schema
 
-All keys required except `portrait_image_path`, `reputation`, and `cyberware`.
+All keys required except `portrait_image_path`, `reputation`, `cyberware`,
+`gear`, `money`, `ip`, and `addictions`.
 `skills` keys must be normalized skill names present in
 `scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (60 entries covering
 the sheet's primary skill list, each mapped to the stat it rolls against) or
@@ -129,15 +130,21 @@ a specialization" skills, so name the specific area/instrument in parens, e.g.
 `"Local Expert (Combat Zone)"` or `"Play Instrument (Guitar)"` — the script
 raises an error naming any skill you use that isn't in either set, so treat
 that as a sign to pick a different/adjacent skill name rather than inventing
-one. The sheet prints each skill's LVL and its rolled TOTAL (stat + level)
-automatically — don't compute or write the total yourself.
+one. You only list the skills a character has *trained* (level > 0); the sheet
+prints the **full** CPR skill list regardless — trained skills are highlighted,
+and every untrained skill is shown dimmed at its base total (its governing stat,
+level 0), since it's still rollable. Each skill's LVL and rolled TOTAL
+(stat + level) are printed automatically — don't compute or write the total
+yourself.
 
 `reputation` defaults to 2 (CPR's starting Reputation for a new character) if
 omitted. `seriously_wounded` (Seriously Wounded Threshold) and `death_save`
 are computed automatically from `hp.max` and `stats.BODY` — don't add them to
-the JSON. `cyberware` is an optional list; omit it or leave it `[]` for a
-concept that doesn't call for any — the sheet's Cyberware section is only
-printed when the list is non-empty.
+the JSON. The following sections print only when their (optional) key is
+present, so omit any that don't apply: `cyberware` (list of `{name, effect}`),
+`gear` (list of `{name, notes}`), `addictions` (free-text string), `money`
+(any of `cash`/`rent`/`housing`/`lifestyle`), and `ip` (Improvement Points,
+`{current, total}`).
 
 ```json
 {
@@ -154,6 +161,10 @@ printed when the list is non-empty.
   "weapons": [{"name": "Medium Pistol", "dmg": "2d6", "ammo": "10(c)", "rof": "2", "notes": ""}],
   "armor": {"head": {"sp": 0, "penalty": 0}, "body": {"sp": 11, "penalty": 0}, "shield": {"sp": 0, "penalty": 0}},
   "cyberware": [{"name": "Cybereye (Infrared)", "effect": "string"}],
+  "gear": [{"name": "Agent (Pocket-KI)", "notes": "string"}],
+  "money": {"cash": 500, "rent": 200, "housing": "string", "lifestyle": "string"},
+  "ip": {"current": 0, "total": 0},
+  "addictions": "string",
   "fashion": "string",
   "role_specific_lifepath": "string",
   "notes": "string",

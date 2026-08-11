@@ -195,7 +195,58 @@ th {
   font-weight: 400;
 }
 td.mono, th.mono { font-family: "JetBrains Mono", monospace; }
-td.total { color: var(--circuit); font-weight: 700; }
+
+/* Full skill list, laid out as a fragmentable two-column flow (CSS multicol,
+   not flex — flex can't break across page boundaries, which stranded the whole
+   block on a fresh page). Trained skills read at full ink; the rest (rollable
+   at base STAT) are dimmed so the whole list is present without the untrained
+   majority competing for attention. */
+.skill-list { column-count: 2; column-gap: 16pt; }
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr 22pt 30pt;
+  gap: 6pt;
+  align-items: baseline;
+  padding: 3pt 2pt;
+  border-bottom: 0.5pt solid var(--hairline);
+  break-inside: avoid;
+  font-size: 9.5pt;
+}
+.skill-row .mono { text-align: right; }
+.skill-head {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: var(--chrome);
+  letter-spacing: 0.03em;
+}
+.stat-tag { color: var(--chrome); }
+.skills .trained .skill-name { font-weight: 700; }
+.skills .trained .total { color: var(--circuit); font-weight: 700; }
+.skills .untrained { color: var(--chrome); }
+
+/* Resources: improvement points + money/lifestyle, as compact labeled chips. */
+.resource-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6pt; }
+.resource {
+  padding: 5pt 4pt;
+  text-align: center;
+  border-top: 1.5pt solid var(--ink);
+  border-bottom: 0.5pt solid var(--hairline);
+}
+.resource-label {
+  display: block;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 7pt;
+  text-transform: uppercase;
+  color: var(--chrome);
+}
+.resource-value {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 11pt;
+  margin-top: 2pt;
+}
 
 /* Free text blocks */
 .freetext-block { margin-top: 9pt; break-inside: avoid; }
@@ -203,8 +254,8 @@ td.total { color: var(--circuit); font-weight: 700; }
 
 .crit-box {
   border: 0.75pt solid var(--hairline);
-  padding: 8pt;
-  min-height: 24pt;
+  padding: 6pt;
+  min-height: 18pt;
 }
 .crit-box .fill-line {
   border-bottom: 0.5pt dotted var(--hairline);
@@ -213,7 +264,7 @@ td.total { color: var(--circuit); font-weight: 700; }
 .crit-box .fill-line:last-child { border-bottom: none; }
 
 footer {
-  margin-top: 16pt;
+  margin-top: 10pt;
   padding-top: 5pt;
   border-top: 0.5pt solid var(--hairline);
   font-family: "JetBrains Mono", monospace;

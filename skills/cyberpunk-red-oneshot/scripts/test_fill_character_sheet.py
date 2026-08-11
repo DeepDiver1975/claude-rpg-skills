@@ -6,7 +6,12 @@ import pytest
 from PIL import Image
 from pypdf import PdfReader
 
-from fill_character_sheet import build_skill_rows, fill_character_sheet, render_character_sheet_html
+from fill_character_sheet import (
+    SKILL_GOVERNING_STAT,
+    build_skill_rows,
+    fill_character_sheet,
+    render_character_sheet_html,
+)
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 FIXTURE = SKILL_DIR / "scripts" / "fixtures" / "sample_character.json"
@@ -89,6 +94,73 @@ def test_category_skill_without_specialization_still_valid():
     character = _character()
     character["skills"] = {"Local Expert": 4}
     render_character_sheet_html(character)  # must not raise
+
+
+def test_build_skill_rows_lists_every_canonical_skill_even_untrained():
+    # The sheet must show the FULL CPR skill list, not only trained skills, so a
+    # player can see everything they can still attempt at base STAT (level 0).
+    stats = _character()["stats"]
+    rows = build_skill_rows({"Athletics": 4}, stats)
+
+    names = {row["name"] for row in rows}
+    assert set(SKILL_GOVERNING_STAT) <= names
+
+    cryptography = next(row for row in rows if row["name"] == "Cryptography")
+    assert cryptography["level"] == 0
+    assert cryptography["total"] == stats["INT"]  # base stat, untrained
+    assert cryptography["trained"] is False
+
+    athletics = next(row for row in rows if row["name"] == "Athletics")
+    assert athletics["level"] == 4
+    assert athletics["trained"] is True
+
+
+def test_full_skill_list_renders_untrained_skills_in_html():
+    # The fixture trains only 3 skills; the rendered sheet must still list the
+    # untrained ones (Cryptography, Wilderness Survival) with their base totals.
+    html = render_character_sheet_html(_character())
+    assert "Cryptography" in html
+    assert "Wilderness Survival" in html
+
+
+def test_addictions_section_rendered_when_present():
+    character = _character()
+    character["addictions"] = "Synthkokain, schwer"
+    html = render_character_sheet_html(character)
+    assert "Synthkokain" in html
+    assert "Addictions" in html
+
+
+def test_gear_section_rendered_when_present():
+    character = _character()
+    character["gear"] = [{"name": "Agent (Pocket-KI)", "notes": "Verschlüsselt"}]
+    html = render_character_sheet_html(character)
+    assert "Agent (Pocket-KI)" in html
+    assert "Verschlüsselt" in html
+
+
+def test_resources_section_renders_money_and_improvement_points():
+    character = _character()
+    character["money"] = {"cash": 500, "rent": 200, "housing": "Conapt-Kabine", "lifestyle": "Kestrel"}
+    character["ip"] = {"current": 15, "total": 45}
+    html = render_character_sheet_html(character)
+    assert "500" in html
+    assert "Conapt-Kabine" in html
+    assert "15" in html and "45" in html
+
+
+def test_optional_sections_absent_when_not_in_character():
+    # A character JSON without the new fields must render without empty
+    # Addictions / Gear / Resources section headers.
+    character = _character()
+    for key in ("addictions", "gear", "money", "ip"):
+        character.pop(key, None)
+    html = render_character_sheet_html(character)
+    # Assert on the rendered section headers, not bare words — "Resources" etc.
+    # also appear in the inlined <style> comments.
+    assert '<div class="section-label">Addictions</div>' not in html
+    assert '<div class="section-label">Gear</div>' not in html
+    assert '<div class="section-label">Resources</div>' not in html
 
 
 def test_fill_character_sheet_produces_a_readable_pdf_with_correct_values(tmp_path):

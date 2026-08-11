@@ -62,18 +62,18 @@
 
   <section class="skills">
     <div class="section-label">Skills</div>
-    <table>
-      <thead><tr><th>Skill</th><th class="mono">LVL</th><th class="mono">TOTAL</th></tr></thead>
-      <tbody>
-        {% for skill in skills %}
-        <tr>
-          <td>{{ skill.name }} <span style="color: var(--chrome);">({{ skill.stat }})</span></td>
-          <td class="mono">{{ skill.level }}</td>
-          <td class="mono total">{{ skill.total }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="skill-list">
+      <div class="skill-row skill-head">
+        <span>Skill</span><span class="mono">LVL</span><span class="mono">TOTAL</span>
+      </div>
+      {% for skill in skills %}
+      <div class="skill-row {{ 'trained' if skill.trained else 'untrained' }}">
+        <span class="skill-name">{{ skill.name }} <span class="stat-tag">({{ skill.stat }})</span></span>
+        <span class="mono">{{ skill.level }}</span>
+        <span class="mono total">{{ skill.total }}</span>
+      </div>
+      {% endfor %}
+    </div>
   </section>
 
   <section class="weapons">
@@ -124,11 +124,54 @@
     </table>
   </section>
 
+  {% if gear %}
+  <section class="gear">
+    <div class="section-label">Gear</div>
+    <table>
+      <thead><tr><th>Item</th><th>Notes</th></tr></thead>
+      <tbody>
+        {% for item in gear %}
+        <tr><td>{{ item.name }}</td><td>{{ item.notes }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  {% if ip or money %}
+  <section class="resources">
+    <div class="section-label">Resources</div>
+    <div class="resource-grid">
+      {% if ip %}
+      <div class="resource"><span class="resource-label">Improvement Pts</span><span class="resource-value">{{ ip.current }}/{{ ip.total }}</span></div>
+      {% endif %}
+      {% if money.cash is defined %}
+      <div class="resource"><span class="resource-label">Cash</span><span class="resource-value">{{ money.cash }}eb</span></div>
+      {% endif %}
+      {% if money.rent is defined %}
+      <div class="resource"><span class="resource-label">Rent</span><span class="resource-value">{{ money.rent }}eb</span></div>
+      {% endif %}
+      {% if money.housing is defined %}
+      <div class="resource"><span class="resource-label">Housing</span><span class="resource-value">{{ money.housing }}</span></div>
+      {% endif %}
+      {% if money.lifestyle is defined %}
+      <div class="resource"><span class="resource-label">Lifestyle</span><span class="resource-value">{{ money.lifestyle }}</span></div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
   <section class="freetext">
     <div class="freetext-block">
       <div class="section-label">Style</div>
       <p>{{ character.fashion }}</p>
     </div>
+    {% if addictions %}
+    <div class="freetext-block">
+      <div class="section-label">Addictions</div>
+      <p>{{ addictions }}</p>
+    </div>
+    {% endif %}
     <div class="freetext-block">
       <div class="section-label">Lifepath</div>
       <p>{{ character.role_specific_lifepath }}</p>

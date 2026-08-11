@@ -88,8 +88,11 @@ def _portrait_data_uri(portrait_image_path: str | None) -> str | None:
 
 
 def build_skill_rows(skills: dict[str, int], stats: dict[str, int]) -> list[dict]:
-    """Map a character's {skill name: level} dict to sorted display rows with
-    each skill's governing stat and rolled total (stat + level).
+    """Return sorted display rows for the FULL CPR skill list, not only the
+    trained ones — an untrained skill is still rollable at its base stat, so the
+    sheet lists every skill with its rolled total (stat + level) and a `trained`
+    flag. The character's chosen category-skill specializations (e.g.
+    "Local Expert (Combat Zone)") are merged in alongside the canonical list.
 
     Raises ValueError naming any skill name that isn't a recognized skill or
     a "category skill (specialization)" (e.g. "Local Expert (Combat Zone)").
@@ -101,14 +104,21 @@ def build_skill_rows(skills: dict[str, int], stats: dict[str, int]) -> list[dict
             "add them there (Task 9) before using a sheet that uses them"
         )
 
+    # The canonical list plus any specialization the character actually named
+    # (bare category skills like "Local Expert" are excluded from the default
+    # list — they're meaningless without an area, so they show only if chosen).
+    specializations = {name for name in skills if name not in SKILL_GOVERNING_STAT}
+    all_names = set(SKILL_GOVERNING_STAT) | specializations
+
     return [
         {
             "name": name,
             "stat": (stat := _governing_stat(name)),
-            "level": level,
+            "level": (level := skills.get(name, 0)),
             "total": level + stats[stat],
+            "trained": name in skills,
         }
-        for name, level in sorted(skills.items())
+        for name in sorted(all_names)
     ]
 
 
@@ -125,6 +135,10 @@ def render_character_sheet_html(character: dict) -> str:
         death_save=stats["BODY"],
         reputation=character.get("reputation", DEFAULT_REPUTATION),
         cyberware=character.get("cyberware", []),
+        addictions=character.get("addictions"),
+        gear=character.get("gear", []),
+        money=character.get("money", {}),
+        ip=character.get("ip"),
         portrait_data_uri=_portrait_data_uri(character.get("portrait_image_path")),
         css=load_css_with_fonts(ASSETS_DIR / "character_sheet.css", ASSETS_DIR / "fonts"),
     )
