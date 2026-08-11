@@ -33,6 +33,29 @@ def load_css_with_fonts(css_path: Path, fonts_dir: Path) -> str:
     )
 
 
+def load_themed_css(structure_css_path: Path, theme_css_path: Path, fonts_dir: Path) -> str:
+    """Compose the structural stylesheet with a theme stylesheet and inline every
+    bundled font both reference.
+
+    The structure file lays out the sheet in terms of theme tokens; the theme
+    file supplies the run's palette (`:root` token values), its display
+    `@font-face`, and any per-preset treatment overrides (e.g. a different
+    `.hazard-stripe`). The theme is concatenated **last** so those overrides win
+    the cascade over the structural defaults — `:root` custom properties and
+    `@font-face` are order-independent, so appending the theme costs nothing
+    there. Font placeholders (`__FONT:<filename>__`) in either file are inlined
+    from `fonts_dir` exactly as `load_css_with_fonts` does.
+    """
+    combined = (
+        Path(structure_css_path).read_text(encoding="utf-8")
+        + "\n"
+        + Path(theme_css_path).read_text(encoding="utf-8")
+    )
+    return _FONT_PLACEHOLDER_RE.sub(
+        lambda m: data_uri(fonts_dir / m.group(1), "font/ttf"), combined
+    )
+
+
 def render_html_to_pdf(html: str, output_pdf: Path) -> None:
     """Render `html` to `output_pdf` via WeasyPrint.
 

@@ -7,10 +7,11 @@ from pathlib import Path
 
 import jinja2
 
-from render_pdf import data_uri, load_css_with_fonts, render_html_to_pdf
+from render_pdf import data_uri, load_themed_css, render_html_to_pdf
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 ASSETS_DIR = SKILL_DIR / "assets"
+THEMES_DIR = ASSETS_DIR / "themes"
 
 _ENV = jinja2.Environment(
     loader=jinja2.FileSystemLoader(ASSETS_DIR),
@@ -18,6 +19,21 @@ _ENV = jinja2.Environment(
 )
 
 _PORTRAIT_MIME_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
+
+# Visual style presets (SKILL.md Step 2 / references/style-guide.md). The GM's
+# chosen preset themes the character sheet's own palette + fonts, matching the
+# look of the art generated for the same run. Each key maps to a theme
+# stylesheet under assets/themes/; the structural character_sheet.css is
+# composed after it (see render_pdf.load_themed_css). The image-prompt style
+# blocks live in references/style-guide.md, not here.
+STYLE_PRESETS = {
+    "cpr-rulebook": "cpr-rulebook.css",
+    "pulp-2020": "pulp-2020.css",
+    "night-city-cinematic": "night-city-cinematic.css",
+    "edgerunners-anime": "edgerunners-anime.css",
+    "chrome-noir": "chrome-noir.css",
+}
+DEFAULT_STYLE_PRESET = "cpr-rulebook"
 
 # The sheet's primary skill list, mapped to its governing stat — sourced from
 # the official sheet's own AcroForm field names (e.g. "LVLAthletics DEX"),
@@ -80,11 +96,30 @@ DEFAULT_REPUTATION = 2
 def _portrait_data_uri(portrait_image_path: str | None) -> str | None:
     if not portrait_image_path:
         return None
-    suffix = Path(portrait_image_path).suffix.lower()
+    path = Path(portrait_image_path)
+    suffix = path.suffix.lower()
     mime = _PORTRAIT_MIME_TYPES.get(suffix)
     if mime is None:
         raise ValueError(f"unsupported portrait image type: {portrait_image_path!r}")
-    return data_uri(Path(portrait_image_path), mime)
+    if not path.is_file():
+        raise ValueError(
+            f"portrait image not found at {portrait_image_path!r} — generate it "
+            "from the character's image-prompts/portrait-*.txt first, or set "
+            '"portrait_image_path": null to render this sheet without a portrait.'
+        )
+    return data_uri(path, mime)
+
+
+def _theme_css_path(style_preset: str) -> Path:
+    """Resolve a style-preset key to its theme stylesheet, failing loudly (like
+    the skill-name guardrail) on an unknown preset."""
+    theme_file = STYLE_PRESETS.get(style_preset)
+    if theme_file is None:
+        raise ValueError(
+            f"unknown style_preset {style_preset!r} — must be one of "
+            f"{sorted(STYLE_PRESETS)}"
+        )
+    return THEMES_DIR / theme_file
 
 
 def build_skill_rows(skills: dict[str, int], stats: dict[str, int]) -> list[dict]:
@@ -126,6 +161,7 @@ def render_character_sheet_html(character: dict) -> str:
     """Render a character JSON dict into a self-contained HTML document string."""
     stats = character["stats"]
     skills = build_skill_rows(character["skills"], stats)
+    theme_css_path = _theme_css_path(character.get("style_preset", DEFAULT_STYLE_PRESET))
 
     template = _ENV.get_template("character_sheet.html.jinja")
     return template.render(
@@ -140,7 +176,7 @@ def render_character_sheet_html(character: dict) -> str:
         money=character.get("money", {}),
         ip=character.get("ip"),
         portrait_data_uri=_portrait_data_uri(character.get("portrait_image_path")),
-        css=load_css_with_fonts(ASSETS_DIR / "character_sheet.css", ASSETS_DIR / "fonts"),
+        css=load_themed_css(ASSETS_DIR / "character_sheet.css", theme_css_path, ASSETS_DIR / "fonts"),
     )
 
 

@@ -68,12 +68,25 @@ question rather than guessing a tone that might clash with the table.
 ## Step 2: Pick a visual style
 
 Ask the GM which visual style preset from `references/style-guide.md` to use
-for this run's image prompts — offer the five named presets (CPR Rulebook,
-2020 Pulp Paperback, Night City Cinematic, Edgerunners Anime, Chrome Noir)
-with a one-line description of each. If the GM has no preference, default to
-CPR Rulebook. Use this preset's base style block for every image prompt
-generated later in this run (Steps 5, 7, 8) — do not mix presets within a
-single one-shot.
+for this run — offer the five named presets (CPR Rulebook, 2020 Pulp Paperback,
+Night City Cinematic, Edgerunners Anime, Chrome Noir) with a one-line
+description of each. If the GM has no preference, default to CPR Rulebook. Use
+this preset's base style block for every image prompt generated later in this
+run (Steps 5, 7, 8) — do not mix presets within a single one-shot.
+
+The same preset also **themes the player character sheets** (palette, display
+font, accent treatment) so the sheets match their art. Record the preset's
+**key** and put it in every PC's `style_preset` field (Step 5):
+
+| Preset | `style_preset` key |
+|---|---|
+| CPR Rulebook (default) | `cpr-rulebook` |
+| 2020 Pulp Paperback | `pulp-2020` |
+| Night City Cinematic | `night-city-cinematic` |
+| Edgerunners Anime | `edgerunners-anime` |
+| Chrome Noir | `chrome-noir` |
+
+(Mook/NPC sheets are not themed — they keep the default look.)
 
 ## Step 3: Generate the crew concept
 
@@ -94,34 +107,69 @@ Netrunner is no longer a hard gap — `data/netrunning.json` covers its mechanic
 
 ## Step 5: Generate each PC
 
+The character sheet embeds the PC's portrait, and that portrait doesn't exist
+until the GM generates it from the prompt with their own image tool. So PC
+creation is split into two phases with a **stop in between** — author the
+characters and their portrait prompts first, wait for the GM to supply the
+images, then render the sheets.
+
+### Step 5a — Author each PC and its portrait prompt (no PDF yet)
+
 For each PC, using `references/cpr-rules-summary.md` (stats/skills/DVs) and
 `references/roles-and-archetypes.md` (Role Ability) and
 `references/weapons-armor-gear.md` (starting gear) — or, when Step 0's extraction
 was done, the verified `data/skills.json`, `data/roles.json`, `data/weapons.json`,
 `data/armor.json`, `data/gear.json`, and `data/cyberware.json` in preference to
-those references: write Rank 0 stats/skills/gear,
-a lifepath-flavored German background tied to the crew concept and to the
-scenario, and a portrait image prompt built from the GM's selected style preset
-(Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
-Additions". Assemble a character JSON matching the **Character JSON Schema**
-below, write it to the run's `characters/` output subfolder (create the dated
-output folder and its `characters/`, `npcs/`, `image-prompts/` subfolders first),
-then run:
+those references: write Rank 0 stats/skills/gear and a lifepath-flavored German
+background tied to the crew concept and to the scenario. Then, per PC:
+
+- Create the dated output folder and its `characters/`, `npcs/`,
+  `image-prompts/` subfolders (first PC only).
+- Write the character JSON to `characters/<handle-slug>.json`, matching the
+  **Character JSON Schema** below. Set `style_preset` to the run's Step-2 preset
+  key, and set `portrait_image_path` to the **expected** portrait file the GM
+  will produce — `characters/<handle-slug>-portrait.png` — even though it does
+  not exist yet. (Only set it to `null` if the GM explicitly wants this PC with
+  no portrait.)
+- Write the portrait prompt to `image-prompts/portrait-<handle-slug>.txt`, built
+  from the GM's selected style preset (Step 2) in `references/style-guide.md`
+  plus its universal "Portrait-Specific Additions".
+- Write a Markdown version of the character for quick reference.
+
+**Do not run `fill_character_sheet.py` yet** — the sheet would fail on the
+missing portrait (that failure is deliberate).
+
+### Step 5b — Checkpoint: wait for the GM's portrait images
+
+Stop and hand the GM the list of portrait prompts. Ask them to run each through
+their own image tool and save the result to the expected path
+(`characters/<handle-slug>-portrait.png`), then tell you to continue. Do not
+proceed to rendering until the GM confirms the images are in place.
+
+### Step 5c — Render the themed PC sheets (after images are supplied)
+
+Once the portraits exist, render each PC sheet:
 
 ```bash
 python3 scripts/fill_character_sheet.py <character.json> <output-folder>/characters/<handle-slug>.pdf
 ```
 
-Portrait compositing is driven by the `portrait_image_path` key in the JSON itself
-(set it to the portrait file's path before running the command above, or leave it
-`null` to skip — there is no separate CLI flag for this).
-
-Also write a Markdown version of the same character for quick reference.
+The sheet is themed by the JSON's `style_preset` and embeds the portrait from
+`portrait_image_path`. If that path is set but the file is still missing, the
+script stops with a clear error — report which portrait is missing rather than
+shipping a sheet without it. A PC the GM opted out of (`portrait_image_path:
+null`) renders without a portrait.
 
 ### Character JSON Schema
 
-All keys required except `portrait_image_path`, `reputation`, `cyberware`,
-`gear`, `money`, `ip`, and `addictions`.
+All keys required except `style_preset`, `portrait_image_path`, `reputation`,
+`cyberware`, `gear`, `money`, `ip`, and `addictions`.
+`style_preset` is the run's Step-2 preset key (`cpr-rulebook`, `pulp-2020`,
+`night-city-cinematic`, `edgerunners-anime`, or `chrome-noir`); it themes the
+sheet and defaults to `cpr-rulebook` if omitted — an unknown value errors.
+`portrait_image_path` points at the portrait the GM produces at the Step-5b
+checkpoint (`characters/<handle-slug>-portrait.png`); a path whose file is
+missing at render time errors, and `null` renders the sheet without a portrait.
 `skills` keys must be normalized skill names present in
 `scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (60 entries covering
 the sheet's primary skill list, each mapped to the stat it rolls against) or
@@ -149,6 +197,7 @@ present, so omit any that don't apply: `cyberware` (list of `{name, effect}`),
 ```json
 {
   "handle": "string",
+  "style_preset": "cpr-rulebook | pulp-2020 | night-city-cinematic | edgerunners-anime | chrome-noir",
   "role": "string (one of the 10 CPR Role names, English)",
   "role_ability": "string",
   "role_ability_rank": 4,
@@ -168,7 +217,7 @@ present, so omit any that don't apply: `cyberware` (list of `{name, effect}`),
   "fashion": "string",
   "role_specific_lifepath": "string",
   "notes": "string",
-  "portrait_image_path": "optional/path/to/portrait.png, or null"
+  "portrait_image_path": "characters/<handle-slug>-portrait.png (produced at the Step-5b checkpoint), or null to skip"
 }
 ```
 

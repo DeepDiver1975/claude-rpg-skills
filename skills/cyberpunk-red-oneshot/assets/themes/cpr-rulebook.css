@@ -1,0 +1,23 @@
+/* Theme: CPR Rulebook (default). Industrial hazard aesthetic — the original
+   look of the sheet. Reproduces the exact palette/fonts used before theming was
+   introduced, so a character with no `style_preset` renders identically. */
+@font-face {
+  font-family: "Archivo Black";
+  font-weight: 400;
+  src: url("__FONT:ArchivoBlack-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Archivo Black", sans-serif;
+  --font-body: "Noto Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #15130f;
+  --paper: #f3efe4;
+  --accent: #ffc300;
+  --accent-2: #0d7d76;
+  --alert: #c81e1e;
+  --muted: #5b5b63;
+  --hairline: #c9c3b2;
+  --on-accent: #15130f;
+}

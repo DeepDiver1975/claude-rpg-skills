@@ -8,6 +8,7 @@ from pypdf import PdfReader
 
 from fill_character_sheet import (
     SKILL_GOVERNING_STAT,
+    STYLE_PRESETS,
     build_skill_rows,
     fill_character_sheet,
     render_character_sheet_html,
@@ -161,6 +162,53 @@ def test_optional_sections_absent_when_not_in_character():
     assert '<div class="section-label">Addictions</div>' not in html
     assert '<div class="section-label">Gear</div>' not in html
     assert '<div class="section-label">Resources</div>' not in html
+
+
+def test_default_style_preset_is_cpr_rulebook():
+    # A character with no style_preset renders the original industrial look — the
+    # cpr-rulebook theme, identifiable by its accent hex inlined in the <style>.
+    html = render_character_sheet_html(_character())
+    assert "--accent: #ffc300;" in html
+
+
+def test_render_character_sheet_html_rejects_unknown_style_preset():
+    character = _character()
+    character["style_preset"] = "vaporwave"
+    with pytest.raises(ValueError, match="vaporwave"):
+        render_character_sheet_html(character)
+
+
+@pytest.mark.parametrize("preset", sorted(STYLE_PRESETS))
+def test_every_style_preset_composes_and_renders(tmp_path, preset):
+    # Each preset's theme CSS + fonts must compose into a valid, non-empty PDF.
+    character = _character()
+    character["style_preset"] = preset
+    character_json = tmp_path / "character.json"
+    character_json.write_text(json.dumps(character, ensure_ascii=False), encoding="utf-8")
+    output_pdf = tmp_path / f"{preset}.pdf"
+
+    fill_character_sheet(character_json, output_pdf)
+
+    assert output_pdf.exists() and output_pdf.stat().st_size > 0
+
+
+def test_style_preset_selects_that_theme_palette():
+    # A non-default preset swaps the inlined palette — night-city-cinematic's
+    # neon-cyan accent replaces cpr-rulebook's hazard yellow.
+    character = _character()
+    character["style_preset"] = "night-city-cinematic"
+    html = render_character_sheet_html(character)
+    assert "--accent: #00e5ff;" in html
+    assert "--accent: #ffc300;" not in html
+
+
+def test_missing_portrait_file_raises_actionable_error(tmp_path):
+    # Referencing a portrait that hasn't been generated yet must fail loudly with
+    # a message that points at the fix, not a bare FileNotFoundError.
+    character = _character()
+    character["portrait_image_path"] = str(tmp_path / "not-generated-yet.png")
+    with pytest.raises(ValueError, match="portrait"):
+        render_character_sheet_html(character)
 
 
 def test_fill_character_sheet_produces_a_readable_pdf_with_correct_values(tmp_path):

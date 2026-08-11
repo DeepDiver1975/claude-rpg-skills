@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-from render_pdf import data_uri, load_css_with_fonts, render_html_to_pdf
+from render_pdf import data_uri, load_css_with_fonts, load_themed_css, render_html_to_pdf
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 FONTS_DIR = SKILL_DIR / "assets" / "fonts"
@@ -39,9 +39,37 @@ def test_load_css_with_fonts_covers_every_placeholder_used_by_the_real_styleshee
     # Guards against a typo'd filename in a real .css file's @font-face rules —
     # a missing font would silently fall back to a system default rather than
     # error, so this checks every placeholder resolves to a file that exists.
-    for css_name in ("character_sheet.css", "mook_sheet.css"):
-        css_path = SKILL_DIR / "assets" / css_name
+    # Includes every theme stylesheet (each declares its own display font).
+    css_paths = [
+        SKILL_DIR / "assets" / "character_sheet.css",
+        SKILL_DIR / "assets" / "mook_sheet.css",
+        *(SKILL_DIR / "assets" / "themes").glob("*.css"),
+    ]
+    for css_path in css_paths:
         load_css_with_fonts(css_path, FONTS_DIR)
+
+
+def test_load_themed_css_appends_theme_after_structure_and_inlines_fonts(tmp_path):
+    # The theme must come AFTER the structure so its treatment overrides win the
+    # cascade (:root/@font-face are order-independent). Font placeholders in
+    # either file are inlined the same way load_css_with_fonts does.
+    structure = tmp_path / "structure.css"
+    structure.write_text(".hazard-stripe { height: 6pt; }\n", encoding="utf-8")
+    theme = tmp_path / "theme.css"
+    theme.write_text(
+        '@font-face { font-family: "X"; src: url("__FONT:NotoSans-Regular.ttf__"); }\n'
+        ":root { --accent: #ff0000; }\n"
+        ".hazard-stripe { height: 2pt; }\n",
+        encoding="utf-8",
+    )
+
+    css = load_themed_css(structure, theme, FONTS_DIR)
+
+    # structure first, theme (the override) last
+    assert css.index("height: 6pt;") < css.index("height: 2pt;")
+    assert "--accent: #ff0000;" in css
+    assert "__FONT:" not in css
+    assert "data:font/ttf;base64," in css
 
 
 def test_render_html_to_pdf_produces_a_readable_pdf(tmp_path):

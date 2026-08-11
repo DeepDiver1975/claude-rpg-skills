@@ -1,0 +1,28 @@
+/* Theme: 2020 Pulp Paperback. Airbrushed retro-futurist cover art — warm cream
+   stock, sunset-orange / electric-blue / hot-pink lighting, ultra-bold condensed
+   poster titling (Anton). Treatment: the header bar becomes a smooth airbrush
+   gradient instead of the industrial hazard chevrons. */
+@font-face {
+  font-family: "Anton";
+  font-weight: 400;
+  src: url("__FONT:Anton-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Anton", sans-serif;
+  --font-body: "Noto Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #241a12;
+  --paper: #f4ead6;
+  --accent: #ff5a3c;
+  --accent-2: #2b6cff;
+  --alert: #d1004b;
+  --muted: #7a6a58;
+  --hairline: #d8c7ac;
+  --on-accent: #fff4ec;
+}
+
+.hazard-stripe {
+  background: linear-gradient(90deg, #ff5a3c 0%, #d1004b 45%, #2b6cff 100%);
+}
