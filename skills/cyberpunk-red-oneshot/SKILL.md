@@ -103,10 +103,12 @@ a lifepath-flavored German background tied to the crew concept and to the
 scenario, and a portrait image prompt built from the GM's selected style preset
 (Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
 Additions". Assemble a character JSON matching the **Character JSON Schema**
-below, write it to the run's output folder, then run:
+below, write it to the run's `characters/` output subfolder (create the dated
+output folder and its `characters/`, `npcs/`, `image-prompts/` subfolders first),
+then run:
 
 ```bash
-python3 scripts/fill_character_sheet.py <character.json> <output-folder>/<handle-slug>.pdf
+python3 scripts/fill_character_sheet.py <character.json> <output-folder>/characters/<handle-slug>.pdf
 ```
 
 Portrait compositing is driven by the `portrait_image_path` key in the JSON itself
@@ -177,7 +179,7 @@ and run (drawing weapon/armor stats from `data/weapons.json` and `data/armor.jso
 when Step 0's extraction was done, otherwise from `references/weapons-armor-gear.md`):
 
 ```bash
-python3 scripts/fill_mook_sheet.py <mook.json> <output-folder>/<name-slug>.pdf
+python3 scripts/fill_mook_sheet.py <mook.json> <output-folder>/npcs/<name-slug>.pdf
 ```
 
 For 1-2 more detailed named NPCs, write a fuller German Markdown stat block plus
@@ -233,9 +235,13 @@ blocks already point to their own image-prompt file.
 ## Step 9: Assemble the output folder
 
 Write everything into a fresh dated folder: `oneshots/YYYY-MM-DD-<slug>/`
-containing: character PDFs + Markdown, the GM guide (German — the single
-scenario-plus-GM-notes document from Step 6, closed out with Step 10's gaps
-section), Mook Sheet PDFs, and `image-prompts/`. If any PDF fill step
+containing a `characters/` subfolder (each PC's PDF + Markdown), an `npcs/`
+subfolder (Mook Sheet PDFs and/or the Markdown NPC stat blocks from Step 7), the
+GM guide (German — the single scenario-plus-GM-notes document from Step 6, closed
+out with Step 10's gaps section) at the folder root, and an `image-prompts/`
+subfolder. When a document in a subfolder points at a file in another subfolder,
+use a correct relative path (e.g. the GM guide at the root links `npcs/…` and
+`image-prompts/…`; an NPC file under `npcs/` links `../image-prompts/…`). If any PDF fill step
 fails, report the failing field name and fall back to delivering that
 character's Markdown sheet only — never silently ship an incomplete PDF without
 saying so.
