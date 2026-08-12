@@ -10,18 +10,20 @@ player group: pregenerated level 1 characters as filled official PDF sheets
 (with portraits) plus Markdown, a linear scenario with GM notes, NPC/monster
 Markdown stat blocks, and a consistent set of image prompts. The GM plays
 this in German; every deliverable this skill writes for players/GM must be
-German — that includes class/species/background names, weapon/armor/gear
-names, damage types, and skill names appearing in prose (Markdown sheets,
-the GM guide, NPC blocks), not just narrative text. Use
-`references/german-terminology.md` for the German term to use; it isn't a
-rules source (mechanics still come from the English `references/*` files
-below), just the vocabulary to write mechanics in. A short, specific list
-of things stay in their literal English SRD form, each for a concrete
-mechanical or sourcing reason spelled out in full where it matters (Step 5):
-the Character JSON schema's `skill_proficiencies`/`skill_expertise`/
-`saving_throw_proficiencies` entries (the script looks these up by exact
-name) and its `subclass` value (no verified German subclass terminology
-exists yet — a deliberate scope gap, not a rule); the official PDF's own
+German — that includes class/subclass/species/background names,
+weapon/armor/gear names, damage types, spell names, and skill names
+appearing in prose (Markdown sheets, the GM guide, NPC blocks), not just
+narrative text. Use `references/german-terminology.md` for the German term
+to use — every term in it is sourced from the official German SRD 5.2.1 PDF
+(see `references/extraction-map-de.md` for provenance), not a guess.
+Numeric/mechanical resolution (ability scores, DCs, HP dice, spell slots,
+class features) still comes from the English `references/*` files below,
+since those numbers don't change between language editions of the same
+ruleset. A short, specific list of things stay in their literal English SRD
+form, each for a concrete mechanical or sourcing reason spelled out in full
+where it matters (Step 5): the Character JSON schema's
+`skill_proficiencies`/`skill_expertise`/`saving_throw_proficiencies`
+entries (the script looks these up by exact name); the official PDF's own
 printed field labels, baked into its artwork and not something this skill
 writes; and the image prompts written in Step 8 (image-generation tools
 expect English prompts), each one labeled with the German name/scene it
@@ -123,19 +125,14 @@ de-emphasize it), `spellcasting` (`null` for non-casters), and
 `saving_throw_proficiencies`, `skill_proficiencies`, and `skill_expertise`
 must stay the SRD's literal English terms — `fill_character_sheet.py`
 looks these up by exact name (`skills_field_map.json`, `SKILL_ABILITY`), so
-translating them breaks the script. `class`, `species`, and `background`
-are, perhaps surprisingly, **not** looked up anywhere in the script — it
-writes them straight into `ClassLevel`/`Race `/`Background` with zero
-parsing — so there's no mechanical reason to keep them English, and they
-should be the German term from `references/german-terminology.md` (e.g.
-"Kämpfer", "Zwerg", "Soldat"), matching what actually ends up on the PDF
-and Markdown sheet. `subclass` is the one exception left in English: this
-skill's own glossary only covers class/species/background/skill terms, not
-the 12 SRD subclass names (Champion, Evoker, etc.) — inventing German
-subclass names without a verified source would be exactly the kind of
-unconfirmed guess `references/*` elsewhere goes out of its way to avoid, so
-leave `subclass` as the SRD's English term for now (a Step 10-style gap,
-worth fixing once verified German subclass terminology is sourced).
+translating them breaks the script. `class`, `subclass`, `species`, and
+`background` are, perhaps surprisingly, **not** looked up anywhere in the
+script — it writes them straight into `ClassLevel`/`Race `/`Background`
+with zero parsing — so there's no mechanical reason to keep them English,
+and they should be the German term from `references/german-terminology.md`
+or `references/classes-and-subclasses.md` (e.g. "Kämpfer", "Zwerg",
+"Soldat", "Domäne des Lebens" for `subclass`), matching what actually ends
+up on the PDF and Markdown sheet.
 `weapons[].name`/`.properties`/`.mastery`/`.damage_type`, `armor.name`,
 `equipment[]`, and `features_and_traits[]` are pure display text the
 script never parses either, so write those in German too. The example
@@ -146,7 +143,7 @@ below shows all of this together:
   "name": "string",
   "species": "string (German term, e.g. \"Zwerg\" — see german-terminology.md)",
   "class": "string (German term, e.g. \"Kämpfer\")",
-  "subclass": "string (the SRD's single listed subclass, left in English — see note above)",
+  "subclass": "string (German term from classes-and-subclasses.md, e.g. \"Domäne des Lebens\")",
   "level": 1,
   "background": "string (German term, e.g. \"Soldat\")",
   "alignment": "string, optional",
@@ -178,15 +175,16 @@ below shows all of this together:
 `references/spellcasting-summary.md`):
 
 ```json
-{"ability": "INT", "cantrips": ["Fire Bolt", "Mage Hand"], "spells_known_or_prepared": ["Magic Missile", "Shield"], "spell_slots": {"1": 2}}
+{"ability": "INT", "cantrips": ["Feuerpfeil", "Magierhand"], "spells_known_or_prepared": ["Magisches Geschoss", "Schild"], "spell_slots": {"1": 2}}
 ```
 
-Spell names stay in their English SRD form for the same reason `subclass`
-does: `references/german-terminology.md` doesn't cover them, and inventing
-German spell names without a verified source risks contradicting the
-official German translation. Treat this the same way as the `subclass`
-gap — fine to leave as-is, worth fixing once verified German spell
-terminology is sourced.
+Spell names should be the German term from `references/spellcasting-
+summary.md`'s curated shortlist (sourced from the official German SRD PDF,
+see `references/german-terminology.md`). If a one-shot needs a spell not
+on that shortlist, its German name isn't verified there — fetch it from
+the official German SRD PDF (or `data/raw/spells.txt`, if the extraction
+in `references/extraction-map-de.md` has been run) before using it, rather
+than guessing; that's a Step 10 gap like any other unverified term.
 
 `skill_proficiencies`/`skill_expertise` keys must be normalized skill names
 present in `assets/skills_field_map.json` (the 18 SRD skills) — the script
@@ -216,9 +214,8 @@ aware the printed PDF's field label still literally says "RACE" in English
 printed next to it — the character's `species`, per the schema above — is
 written in German (e.g. "Zwerg"), same as `class`/`background`. Only the
 field's own printed label is stuck in English; everything this skill
-actually writes into the page (species/class/background values, weapon
-names, equipment, features, backstory, personality) is German, `subclass`
-excepted per the schema note above.
+actually writes into the page (species/class/subclass/background values,
+weapon names, equipment, features, backstory, personality) is German.
 
 **Known constraint — text fields auto-shrink, they don't clip**: unlike the
 Cyberpunk RED skill's character sheet (which hard-clips overlong text),
