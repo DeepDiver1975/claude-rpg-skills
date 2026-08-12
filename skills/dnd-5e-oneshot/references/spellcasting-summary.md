@@ -6,6 +6,11 @@ Spellcasting mechanics summarized from `equipment.md`/`playing-the-game.md`;
 spell entries summarized from `classes.md`'s per-class spell lists and
 `spells.md`, both in
 [downfallx/dnd-5e-srd-markdown](https://github.com/downfallx/dnd-5e-srd-markdown).
+Each spell's German name below (in parentheses on first mention) is sourced
+from the official German SRD PDF — see `german-terminology.md` and
+`extraction-map-de.md` for provenance. Write the German name in generated
+output (per SKILL.md's language rule); the parenthetical English SRD name is
+here only so the mechanics below stay traceable to the source spell.
 
 **This is a curated shortlist, not the full SRD spell list** (`spells.md`
 alone is 300+ KB). It covers enough cantrips and level-1 spells to build a
@@ -44,66 +49,82 @@ older edition.
   Cleric, Druid, Wizard).
 
 ## Bard (CHA)
-**Cantrips**: Vicious Mockery (WIS save or 1d6 Psychic + Disadvantage on its
-next attack), Mage Hand (spectral hand, minor manipulation, 30 ft, 10 lb
-limit), Minor Illusion (minor sound or image), Message (silent whispered
-exchange with one target), True Strike (attack with a weapon using your
+**Cantrips**: Gehässiger Spott/Vicious Mockery (WIS save or 1d6 Psychic +
+Disadvantage on its next attack), Magierhand/Mage Hand (spectral hand, minor
+manipulation, 30 ft, 10 lb limit), Einfache Illusion/Minor Illusion (minor
+sound or image), Botschaft/Message (silent whispered exchange with one
+target), Zielsicherer Schlag/True Strike (attack with a weapon using your
 spellcasting ability instead of STR/DEX).
-**Level 1**: Healing Word (Bonus Action, 2d4+mod HP at range), Charm Person
-(WIS save or Charmed 1 hr), Faerie Fire (DEX save or outlined/Advantage to
-hit, C), Comprehend Languages (understand any language, 1 hr, R),
-Dissonant Whispers (WIS save or damage + forced movement), Animal
-Friendship (WIS save or a beast is Charmed 24 hr).
+**Level 1**: Heilendes Wort/Healing Word (Bonus Action, 2d4+mod HP at
+range), Person bezaubern/Charm Person (WIS save or Charmed 1 hr),
+Feenfeuer/Faerie Fire (DEX save or outlined/Advantage to hit, C), Sprachen
+verstehen/Comprehend Languages (understand any language, 1 hr, R),
+Dissonantes Flüstern/Dissonant Whispers (WIS save or damage + forced
+movement), Tierfreundschaft/Animal Friendship (WIS save or a beast is
+Charmed 24 hr).
 
 ## Cleric (WIS)
-**Cantrips**: Guidance (touch, +1d4 to one ability check, C), Sacred Flame
-(DEX save or 1d8 Radiant, ignores cover), Thaumaturgy (minor divine wonder
-effects), Spare the Dying (touch, stabilize a creature at 0 HP).
-**Level 1**: Bless (up to 3 allies add 1d4 to attacks/saves, C), Cure Wounds
-(touch, 2d8+mod HP), Healing Word (Bonus Action, 2d4+mod HP at range),
-Command (WIS save or follow a one-word command), Detect Magic (sense magic
-within 30 ft, C, R).
+**Cantrips**: Göttliche Führung/Guidance (touch, +1d4 to one ability check,
+C), Heilige Flamme/Sacred Flame (DEX save or 1d8 Radiant, ignores cover),
+Thaumaturgie/Thaumaturgy (minor divine wonder effects), Verschonung der
+Sterbenden/Spare the Dying (touch, stabilize a creature at 0 HP).
+**Level 1**: Segnen/Bless (up to 3 allies add 1d4 to attacks/saves, C),
+Wunden heilen/Cure Wounds (touch, 2d8+mod HP), Heilendes Wort/Healing Word
+(Bonus Action, 2d4+mod HP at range), Befehl/Command (WIS save or follow a
+one-word command), Magie entdecken/Detect Magic (sense magic within 30 ft,
+C, R).
 
 ## Druid (WIS)
-**Cantrips**: Druidcraft (minor nature effect), Guidance (+1d4 to one
-ability check, C), Message, Spare the Dying.
-**Level 1**: Cure Wounds, Faerie Fire (C), Entangle (20-ft difficult
-terrain, C), Goodberry (10 berries, 1 HP + a day's food each), Animal
-Friendship, Speak with Animals (talk to Beasts, 10 min), Longstrider (+10
-ft Speed, 1 hr), Detect Magic (C, R).
+**Cantrips**: Druidenkunst/Druidcraft (minor nature effect), Göttliche
+Führung/Guidance (+1d4 to one ability check, C), Botschaft/Message,
+Verschonung der Sterbenden/Spare the Dying.
+**Level 1**: Wunden heilen/Cure Wounds, Feenfeuer/Faerie Fire (C),
+Verstricken/Entangle (20-ft difficult terrain, C), Gute Beeren/Goodberry
+(10 berries, 1 HP + a day's food each), Tierfreundschaft/Animal Friendship,
+Mit Tieren sprechen/Speak with Animals (talk to Beasts, 10 min), Lange
+Schritte/Longstrider (+10 ft Speed, 1 hr), Magie entdecken/Detect Magic
+(C, R).
 
 ## Paladin (CHA, half-caster — no cantrips, no usable slots until level 2)
-**Level 1 (learned now, usable from level 2)**: Bless (C), Cure Wounds,
-Command, Detect Magic (C, R).
+**Level 1 (learned now, usable from level 2)**: Segnen/Bless (C), Wunden
+heilen/Cure Wounds, Befehl/Command, Magie entdecken/Detect Magic (C, R).
 
 ## Ranger (WIS, half-caster — no cantrips, no usable slots until level 2)
-**Level 1 (learned now, usable from level 2)**: Hunter's Mark (Bonus
-Action, +1d6 Force per hit on marked target, C — also a class feature
-Rangers have prepared for free, see `classes-and-subclasses.md`), Cure
-Wounds, Goodberry, Speak with Animals, Entangle (C), Animal Friendship,
-Longstrider, Detect Magic (C, R).
+**Level 1 (learned now, usable from level 2)**: Fesselnder Schlag/Hunter's
+Mark (Bonus Action, +1d6 Force per hit on marked target, C — also a class
+feature Rangers have prepared for free, see `classes-and-subclasses.md`),
+Wunden heilen/Cure Wounds, Gute Beeren/Goodberry, Mit Tieren sprechen/Speak
+with Animals, Verstricken/Entangle (C), Tierfreundschaft/Animal Friendship,
+Lange Schritte/Longstrider, Magie entdecken/Detect Magic (C, R).
 
 ## Sorcerer (CHA)
-**Cantrips**: Fire Bolt (ranged spell attack, 1d10 Fire), Mage Hand,
-Minor Illusion, Prestidigitation (minor magic trick, up to 3 active
-effects), True Strike.
-**Level 1**: Magic Missile (3 darts, 1d4+1 Force each, auto-hit), Shield
-(Reaction, +5 AC + Magic Missile immunity until your next turn), Charm
-Person, Disguise Self (alter your appearance, 1 hr), Feather Fall (slow up
-to 5 falling creatures), Sleep (WIS save or Incapacitated→Unconscious, C),
-Detect Magic (C, R).
+**Cantrips**: Feuerpfeil/Fire Bolt (ranged spell attack, 1d10 Fire),
+Magierhand/Mage Hand, Einfache Illusion/Minor Illusion,
+Taschenspielerei/Prestidigitation (minor magic trick, up to 3 active
+effects), Zielsicherer Schlag/True Strike.
+**Level 1**: Magisches Geschoss/Magic Missile (3 darts, 1d4+1 Force each,
+auto-hit), Schild/Shield (Reaction, +5 AC + Magic Missile immunity until
+your next turn), Person bezaubern/Charm Person, Selbstverkleidung/Disguise
+Self (alter your appearance, 1 hr), Federfall/Feather Fall (slow up to 5
+falling creatures), Schlaf/Sleep (WIS save or Incapacitated→Unconscious,
+C), Magie entdecken/Detect Magic (C, R).
 
 ## Warlock (CHA)
-**Cantrips**: Eldritch Blast (ranged spell attack, 1d10 Force, extra beams
-at higher levels — irrelevant at level 1), Mage Hand, Minor Illusion,
-Prestidigitation, True Strike.
-**Level 1**: Charm Person, Comprehend Languages (R), Speak with Animals,
-Detect Magic (C, R).
+**Cantrips**: Schauriger Strahl/Eldritch Blast (ranged spell attack, 1d10
+Force, extra beams at higher levels — irrelevant at level 1),
+Magierhand/Mage Hand, Einfache Illusion/Minor Illusion,
+Taschenspielerei/Prestidigitation, Zielsicherer Schlag/True Strike.
+**Level 1**: Person bezaubern/Charm Person, Sprachen
+verstehen/Comprehend Languages (R), Mit Tieren sprechen/Speak with
+Animals, Magie entdecken/Detect Magic (C, R).
 
 ## Wizard (INT)
-**Cantrips**: Fire Bolt, Mage Hand, Minor Illusion, Prestidigitation,
-Message.
-**Level 1**: Magic Missile, Shield, Detect Magic (C, R), Find Familiar
-(summon a Beast-form spirit companion), Identify (learn a magic item's
-properties, R), Silent Image (visual-only illusion up to a 15-ft cube, C),
-Comprehend Languages (R), Sleep (C).
+**Cantrips**: Feuerpfeil/Fire Bolt, Magierhand/Mage Hand, Einfache
+Illusion/Minor Illusion, Taschenspielerei/Prestidigitation,
+Botschaft/Message.
+**Level 1**: Magisches Geschoss/Magic Missile, Schild/Shield, Magie
+entdecken/Detect Magic (C, R), Vertrauten finden/Find Familiar (summon a
+Beast-form spirit companion), Identifizieren/Identify (learn a magic
+item's properties, R), Lautloses Trugbild/Silent Image (visual-only
+illusion up to a 15-ft cube, C), Sprachen verstehen/Comprehend Languages
+(R), Schlaf/Sleep (C).

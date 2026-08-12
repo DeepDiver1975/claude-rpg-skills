@@ -46,14 +46,45 @@ maps 2024/SRD-5.2.1 character data onto this sheet's field names; see
 2024 "Species" value is written into the sheet's own field literally named
 `Race `).
 
-### 2. Install requirements
+### 2. (Optional) Get the official German SRD PDF, to re-verify/extend terminology
+
+This skill's German output already uses official terms — every entry in
+`references/german-terminology.md` was sourced from the official German
+translation of the SRD and is committed to this repo (see
+`references/extraction-map-de.md` for provenance). You only need this step
+if you want to re-run or extend that extraction (e.g. to cover a spell
+outside the curated shortlist, or re-verify after a future SRD point
+release):
+
+- `assets/DE_SRD_CC_v5.2.1.pdf` — from
+  <https://media.dndbeyond.com/compendium-images/srd/5.2/DE_SRD_CC_v5.2.1.pdf>,
+  released by Wizards of the Coast LLC under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Freely
+  downloadable — no ownership gate, unlike the Cyberpunk RED skill's paid
+  core rulebook.
+
+Then run:
+
+```bash
+python3 scripts/extract_srd_de.py assets/DE_SRD_CC_v5.2.1.pdf --all
+```
+
+This writes page-ranged raw text into `data/raw/*.txt` (gitignored — an
+unreviewed extraction scratch, not meant for redistribution). Read those
+files against `references/extraction-map-de.md` to update
+`references/german-terminology.md`, `classes-and-subclasses.md`, or
+`spellcasting-summary.md`.
+
+### 4. Install requirements
 
 - `pdftk` — PDF form filling
 - ImageMagick (`magick`/`convert`) — portrait image compositing
 - `mutool` (from `mupdf-tools`) — used by the test suite to verify rendering
+- `pdftotext`/`pdfinfo` (from `poppler-utils`) — only needed for step 2's
+  extraction script
 - Python 3 and `pytest` (stdlib only otherwise — no PyPI packages required)
 
-### 3. Install the skill
+### 5. Install the skill
 
 ```bash
 ln -s "$(pwd)/skills/dnd-5e-oneshot" ~/.claude/skills/dnd-5e-oneshot
@@ -68,9 +99,12 @@ cd scripts
 pytest -v
 ```
 
-31 tests total. Nearly all of them fill and render the real character sheet
-PDF, so they'll fail until step 1 above is done — that's expected, not a
-bug.
+33 tests total. Most of them fill and render the real character sheet PDF,
+so they'll fail until step 1 above is done — that's expected, not a bug.
+The two `test_terminology_de.py` tests don't need any PDF; they just check
+that `references/classes-and-subclasses.md` and
+`references/spellcasting-summary.md` stay in sync with
+`references/german-terminology.md`.
 
 ## License
 
@@ -78,6 +112,10 @@ The Python code (`scripts/*.py`) is original work. The reference material
 (`references/*.md`) is summarized/rewritten from the System Reference
 Document 5.2.1 by Wizards of the Coast LLC, licensed under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — each file cites
-its source per that license's attribution requirement. The official
-character sheet PDF (not included, see Setup) remains Wizards of the
-Coast's own copyrighted work, provided by them free for personal use.
+its source per that license's attribution requirement.
+`references/german-terminology.md` and the German subclass/spell names in
+`classes-and-subclasses.md`/`spellcasting-summary.md` are sourced from the
+official German translation of the same SRD 5.2.1, under the same license
+(see `references/extraction-map-de.md`). The official character sheet PDF
+(not included, see Setup) remains Wizards of the Coast's own copyrighted
+work, provided by them free for personal use.

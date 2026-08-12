@@ -4,7 +4,9 @@ Source: System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast
 LLC, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 Summarized from `classes.md` in
 [downfallx/dnd-5e-srd-markdown](https://github.com/downfallx/dnd-5e-srd-markdown)
-(itself a CC BY 4.0 Markdown conversion of the official SRD).
+(itself a CC BY 4.0 Markdown conversion of the official SRD). Each subclass's
+German name is sourced from the official German SRD PDF — see
+`german-terminology.md` and `extraction-map-de.md`.
 
 **Every one of the SRD's 12 classes gains its subclass at level 3, with no
 exceptions** — this is uniform across all 12 classes in the 2024 rules (a
@@ -34,7 +36,7 @@ weapons: Simple and Martial · armor: Light/Medium + Shields.
 - **Unarmored Defense**: AC = 10 + DEX mod + CON mod while unarmored.
 - **Weapon Mastery**: can use the mastery property of 2 chosen weapon types.
 
-Subclass: **Path of the Berserker** — *"Channel Rage into Violent Fury."*
+Subclass: **Path of the Berserker** (German: **Pfad des Berserkers**) — *"Channel Rage into Violent Fury."*
 Directs Rage toward pure violence and battlefield chaos. Headline (L3
 Frenzy): extra weapon-type damage dice on the first hit each turn while
 raging and using Reckless Attack.
@@ -46,7 +48,7 @@ choose 3 musical instruments · weapons: Simple · armor: Light.
   attack roll.
 - **Spellcasting**: CHA-based, full caster progression.
 
-Subclass: **College of Lore** — *"Plumb the Depths of Magical Knowledge."*
+Subclass: **College of Lore** (German: **Schule des Wissens**) — *"Plumb the Depths of Magical Knowledge."*
 Collectors of spells and secrets. Headline (L3 Bonus Proficiencies):
 proficiency in 3 additional skills of choice.
 
@@ -58,7 +60,7 @@ Light/Medium + Shields.
 - **Divine Order**: choose Protector (martial-weapon/heavy-armor training) or
   Thaumaturge (extra cantrip + Religion-check bonus) at level 1.
 
-Subclass: **Life Domain** — *"Soothe the Hurts of the World."* Masters of
+Subclass: **Life Domain** (German: **Domäne des Lebens**) — *"Soothe the Hurts of the World."* Masters of
 healing magic. Headline (L3 Disciple of Life): healing spells restore extra
 HP equal to 2 + the spell slot's level.
 
@@ -75,7 +77,7 @@ tools: Herbalism Kit · weapons: Simple · armor: Light + Shields.
 (Wild Shape is a level-2 feature in the 2024 rules, not level 1 — don't grant
 it to a level-1 pregen.)
 
-Subclass: **Circle of the Land** — *"Celebrate Connection to the Natural
+Subclass: **Circle of the Land** (German: **Zirkel des Landes**) — *"Celebrate Connection to the Natural
 World."* Sages who safeguard primal knowledge. Headline (L3 Circle of the
 Land Spells): pick a land type (arid/polar/temperate/tropical) each Long
 Rest for bonus always-prepared spells.
@@ -91,7 +93,7 @@ Light/Medium/Heavy + Shields.
   level.
 - **Weapon Mastery**: mastery property of 3 chosen weapon types.
 
-Subclass: **Champion** — *"Pursue Physical Excellence in Combat."* Relentless
+Subclass: **Champion** (German: **Champion**) — *"Pursue Physical Excellence in Combat."* Relentless
 pursuit of martial victory. Headline (L3 Improved Critical): scores a
 critical hit on a roll of 19–20, not just 20.
 
@@ -105,7 +107,7 @@ with the Light property · armor: none (relies on Unarmored Defense).
 - **Unarmored Defense**: AC = 10 + DEX mod + WIS mod while unarmored and
   shieldless.
 
-Subclass: **Warrior of the Open Hand** — *"Master Unarmed Combat
+Subclass: **Warrior of the Open Hand** (German: **Krieger der Offenen Hand**) — *"Master Unarmed Combat
 Techniques."* Push/trip techniques and self-protection. Headline (L3 Open
 Hand Technique): Flurry of Blows hits can also Addle, Push, or Topple the
 target.
@@ -119,7 +121,7 @@ Simple and Martial · armor: Light/Medium/Heavy + Shields.
 - **Spellcasting**: CHA-based, half-caster progression.
 - **Weapon Mastery**: mastery property of 2 chosen weapon types.
 
-Subclass: **Oath of Devotion** — *"Uphold the Ideals of Justice and Order."*
+Subclass: **Oath of Devotion** (German: **Schwur der Hingabe**) — *"Uphold the Ideals of Justice and Order."*
 The knight-in-shining-armor archetype. Headline (L3 Oath of Devotion
 Spells): always-prepared bonus spells at set Paladin levels.
 
@@ -133,7 +135,7 @@ Shields.
   without a spell slot.
 - **Weapon Mastery**: mastery property of 2 chosen weapon types.
 
-Subclass: **Hunter** — *"Protect Nature and People from Destruction."*
+Subclass: **Hunter** (German: **Jäger**) — *"Protect Nature and People from Destruction."*
 Headline (L3 Hunter's Lore): while a target is marked by *Hunter's Mark*,
 learn its immunities/resistances/vulnerabilities.
 
@@ -148,7 +150,7 @@ weapons: Simple + Martial weapons with Finesse or Light · armor: Light.
 - **Thieves' Cant** + a bonus language.
 - **Weapon Mastery**: mastery property of 2 chosen weapon types.
 
-Subclass: **Thief** — *"Hunt for Treasure as a Classic Adventurer."* Headline
+Subclass: **Thief** (German: **Dieb**) — *"Hunt for Treasure as a Classic Adventurer."* Headline
 (L3 Fast Hands): Bonus Action Sleight of Hand check, Utilize/Magic-item-use
 action, or Disarm/Pick Lock with Thieves' Tools.
 
@@ -160,7 +162,7 @@ armor: none.
 - **Innate Sorcery** (Bonus Action, limited uses/rest, 1 minute): +1 to
   Sorcerer spell save DC and Advantage on Sorcerer spell attack rolls.
 
-Subclass: **Draconic Sorcery** — *"Breathe the Magic of Dragons."* Innate
+Subclass: **Draconic Sorcery** (German: **Drakonische Zauberei**) — *"Breathe the Magic of Dragons."* Innate
 magic from a draconic bloodline/source. Headline (L3 Draconic Resilience):
 +3 max HP (scaling with level) and unarmored AC bonus from dragon-like
 scales.
@@ -174,7 +176,7 @@ Simple · armor: Light.
 - **Pact Magic**: CHA-based casting with its own short-rest-recovering
   slot pool (distinct from other casters' long-rest recovery).
 
-Subclass: **Fiend Patron** — *"Make a Deal with the Lower Planes."* A pact
+Subclass: **Fiend Patron** (German: **Unhold-Schutzherr**) — *"Make a Deal with the Lower Planes."* A pact
 with a demon lord, archdevil, or similarly mighty fiend. Headline (L3 Dark
 One's Blessing): gain temporary HP whenever an enemy near you drops to 0 HP.
 
@@ -189,7 +191,7 @@ Simple · armor: none.
 - **Arcane Recovery** (1/Short Rest): recover expended spell slots (combined
   level ≤ half Wizard level rounded up, none level 6+).
 
-Subclass: **Evoker** — *"Create Explosive Elemental Effects."* Specializes
+Subclass: **Evoker** (German: **Hervorrufer**) — *"Create Explosive Elemental Effects."* Specializes
 in bitter cold, flame, thunder, lightning, and acid magic. Headline (L3
 Evocation Savant): 2 free Evocation spells (level ≤2) added to the
 spellbook, plus ongoing free Evocation spells as new slot levels unlock.

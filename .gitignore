@@ -7,6 +7,12 @@ __pycache__/
 # never commit or redistribute). Produced by scripts/extract_rules.py.
 skills/cyberpunk-red-oneshot/data/
 
+# Locally-extracted raw SRD text dumps and intermediate JSON (unreviewed
+# extraction scratch, not the curated/attributed CC BY 4.0 summaries meant
+# for redistribution — those live in references/*.md). Produced by
+# scripts/extract_srd_de.py.
+skills/dnd-5e-oneshot/data/
+
 .claude
 .env
 oneshots
