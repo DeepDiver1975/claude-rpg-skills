@@ -141,7 +141,8 @@
   {% if ip or money %}
   <section class="resources">
     <div class="section-label">Resources</div>
-    <div class="resource-grid">
+    {% if ip or money.cash is defined or money.rent is defined %}
+    <div class="resource-chips">
       {% if ip %}
       <div class="resource"><span class="resource-label">Improvement Pts</span><span class="resource-value">{{ ip.current }}/{{ ip.total }}</span></div>
       {% endif %}
@@ -151,13 +152,18 @@
       {% if money.rent is defined %}
       <div class="resource"><span class="resource-label">Rent</span><span class="resource-value">{{ money.rent }}eb</span></div>
       {% endif %}
+    </div>
+    {% endif %}
+    {% if money.housing is defined or money.lifestyle is defined %}
+    <div class="resource-lines">
       {% if money.housing is defined %}
-      <div class="resource"><span class="resource-label">Housing</span><span class="resource-value">{{ money.housing }}</span></div>
+      <div class="resource-line"><span class="resource-line-label">Housing</span><span>{{ money.housing }}</span></div>
       {% endif %}
       {% if money.lifestyle is defined %}
-      <div class="resource"><span class="resource-label">Lifestyle</span><span class="resource-value">{{ money.lifestyle }}</span></div>
+      <div class="resource-line"><span class="resource-line-label">Lifestyle</span><span>{{ money.lifestyle }}</span></div>
       {% endif %}
     </div>
+    {% endif %}
   </section>
   {% endif %}
 

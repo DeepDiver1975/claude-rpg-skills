@@ -194,11 +194,11 @@ def test_every_style_preset_composes_and_renders(tmp_path, preset):
 
 def test_style_preset_selects_that_theme_palette():
     # A non-default preset swaps the inlined palette — night-city-cinematic's
-    # neon-cyan accent replaces cpr-rulebook's hazard yellow.
+    # cyan accent replaces cpr-rulebook's hazard yellow.
     character = _character()
     character["style_preset"] = "night-city-cinematic"
     html = render_character_sheet_html(character)
-    assert "--accent: #00e5ff;" in html
+    assert "--accent: #08a5c4;" in html
     assert "--accent: #ffc300;" not in html
 
 
