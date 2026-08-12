@@ -1,0 +1,30 @@
+/* Theme: Edgerunners Anime. Print-friendly light page that keeps the flat,
+   high-saturation cel identity through hot-pink and toxic-green accents and a
+   chunky blocky display (Bungee). Treatment: hard-edged flat pink/green blocks
+   in the header bar. */
+@font-face {
+  font-family: "Bungee";
+  font-weight: 400;
+  src: url("__FONT:Bungee-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Bungee", sans-serif;
+  --font-body: "Noto Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #1a1636;
+  --paper: #f5f1fb;
+  --accent: #ff2e9a;
+  --accent-2: #4e9a06;
+  --alert: #e01e4f;
+  --muted: #6b6790;
+  --hairline: #ddd6ee;
+  --on-accent: #ffffff;
+}
+
+.hazard-stripe {
+  background: repeating-linear-gradient(
+    90deg, #ff2e9a 0, #ff2e9a 20pt, #7ecb1e 20pt, #7ecb1e 40pt
+  );
+}

@@ -6,12 +6,13 @@ description: Use when the user wants to run a Cyberpunk RED one-shot session (a 
 # Cyberpunk RED One-Shot Generator
 
 Generates a complete, ready-to-run Cyberpunk RED one-shot for a 3-5 player group:
-pregenerated Rank 0 characters as filled official PDF sheets (with portraits) plus
-Markdown, a linear scenario with GM notes, NPC/enemy Mook Sheets, and a consistent
+pregenerated Rank 0 characters as original character sheet PDFs (with portraits)
+plus Markdown, a linear scenario with GM notes, NPC/enemy Mook Sheets, and a consistent
 set of image prompts. The GM plays this in German; every deliverable this skill
 writes for players/GM must be German, with three exceptions: this document and
-all `references/*` stay English; Role names (Solo, Netrunner, ...) and PDF field
-labels stay in their original English CPR form even inside German text; and the
+all `references/*` stay English; Role names (Solo, Netrunner, ...) and character/
+Mook sheet section labels stay in their original English CPR form even inside
+German text; and the
 image prompts written in Step 8 stay English (image-generation tools expect
 English prompts), each one labeled with the German name/scene it belongs to.
 
@@ -67,12 +68,25 @@ question rather than guessing a tone that might clash with the table.
 ## Step 2: Pick a visual style
 
 Ask the GM which visual style preset from `references/style-guide.md` to use
-for this run's image prompts — offer the five named presets (CPR Rulebook,
-2020 Pulp Paperback, Night City Cinematic, Edgerunners Anime, Chrome Noir)
-with a one-line description of each. If the GM has no preference, default to
-CPR Rulebook. Use this preset's base style block for every image prompt
-generated later in this run (Steps 5, 7, 8) — do not mix presets within a
-single one-shot.
+for this run — offer the five named presets (CPR Rulebook, 2020 Pulp Paperback,
+Night City Cinematic, Edgerunners Anime, Chrome Noir) with a one-line
+description of each. If the GM has no preference, default to CPR Rulebook. Use
+this preset's base style block for every image prompt generated later in this
+run (Steps 5, 7, 8) — do not mix presets within a single one-shot.
+
+The same preset also **themes the player character sheets** (palette, display
+font, accent treatment) so the sheets match their art. Record the preset's
+**key** and put it in every PC's `style_preset` field (Step 5):
+
+| Preset | `style_preset` key |
+|---|---|
+| CPR Rulebook (default) | `cpr-rulebook` |
+| 2020 Pulp Paperback | `pulp-2020` |
+| Night City Cinematic | `night-city-cinematic` |
+| Edgerunners Anime | `edgerunners-anime` |
+| Chrome Noir | `chrome-noir` |
+
+(Mook/NPC sheets are not themed — they keep the default look.)
 
 ## Step 3: Generate the crew concept
 
@@ -93,41 +107,97 @@ Netrunner is no longer a hard gap — `data/netrunning.json` covers its mechanic
 
 ## Step 5: Generate each PC
 
+The character sheet embeds the PC's portrait, and that portrait doesn't exist
+until the GM generates it from the prompt with their own image tool. So PC
+creation is split into two phases with a **stop in between** — author the
+characters and their portrait prompts first, wait for the GM to supply the
+images, then render the sheets.
+
+### Step 5a — Author each PC and its portrait prompt (no PDF yet)
+
 For each PC, using `references/cpr-rules-summary.md` (stats/skills/DVs) and
 `references/roles-and-archetypes.md` (Role Ability) and
 `references/weapons-armor-gear.md` (starting gear) — or, when Step 0's extraction
 was done, the verified `data/skills.json`, `data/roles.json`, `data/weapons.json`,
 `data/armor.json`, `data/gear.json`, and `data/cyberware.json` in preference to
-those references: write Rank 0 stats/skills/gear,
-a lifepath-flavored German background tied to the crew concept and to the
-scenario, and a portrait image prompt built from the GM's selected style preset
-(Step 2) in `references/style-guide.md` plus its universal "Portrait-Specific
-Additions". Assemble a character JSON matching the **Character JSON Schema**
-below, write it to the run's `characters/` output subfolder (create the dated
-output folder and its `characters/`, `npcs/`, `image-prompts/` subfolders first),
-then run:
+those references: write Rank 0 stats/skills/gear and a lifepath-flavored German
+background tied to the crew concept and to the scenario. Then, per PC:
+
+- Create the dated output folder and its `characters/`, `npcs/`,
+  `image-prompts/` subfolders (first PC only).
+- Write the character JSON to `characters/<handle-slug>.json`, matching the
+  **Character JSON Schema** below. Set `style_preset` to the run's Step-2 preset
+  key, and set `portrait_image_path` to the **expected** portrait file the GM
+  will produce — `characters/<handle-slug>-portrait.png` — even though it does
+  not exist yet. (Only set it to `null` if the GM explicitly wants this PC with
+  no portrait.)
+- Write the portrait prompt to `image-prompts/portrait-<handle-slug>.txt`, built
+  from the GM's selected style preset (Step 2) in `references/style-guide.md`
+  plus its universal "Portrait-Specific Additions".
+- Write a Markdown version of the character for quick reference.
+
+**Do not run `fill_character_sheet.py` yet** — the sheet would fail on the
+missing portrait (that failure is deliberate).
+
+### Step 5b — Checkpoint: wait for the GM's portrait images
+
+Stop and hand the GM the list of portrait prompts. Ask them to run each through
+their own image tool and save the result to the expected path
+(`characters/<handle-slug>-portrait.png`), then tell you to continue. Do not
+proceed to rendering until the GM confirms the images are in place.
+
+### Step 5c — Render the themed PC sheets (after images are supplied)
+
+Once the portraits exist, render each PC sheet:
 
 ```bash
 python3 scripts/fill_character_sheet.py <character.json> <output-folder>/characters/<handle-slug>.pdf
 ```
 
-Portrait compositing is driven by the `portrait_image_path` key in the JSON itself
-(set it to the portrait file's path before running the command above, or leave it
-`null` to skip — there is no separate CLI flag for this).
-
-Also write a Markdown version of the same character for quick reference.
+The sheet is themed by the JSON's `style_preset` and embeds the portrait from
+`portrait_image_path`. If that path is set but the file is still missing, the
+script stops with a clear error — report which portrait is missing rather than
+shipping a sheet without it. A PC the GM opted out of (`portrait_image_path:
+null`) renders without a portrait.
 
 ### Character JSON Schema
 
-All keys required except `portrait_image_path`. `skills` keys must be normalized
-skill names present in `assets/skills_field_map.json` (57 entries covering the
-sheet's primary skill list) — the script raises an error naming any skill you use
-that isn't in that map, so treat that as a sign to pick a different/adjacent skill
-name rather than inventing a field.
+All keys required except `style_preset`, `portrait_image_path`, `reputation`,
+`cyberware`, `gear`, `money`, `ip`, and `addictions`.
+`style_preset` is the run's Step-2 preset key (`cpr-rulebook`, `pulp-2020`,
+`night-city-cinematic`, `edgerunners-anime`, or `chrome-noir`); it themes the
+sheet and defaults to `cpr-rulebook` if omitted — an unknown value errors.
+`portrait_image_path` points at the portrait the GM produces at the Step-5b
+checkpoint (`characters/<handle-slug>-portrait.png`); a path whose file is
+missing at render time errors, and `null` renders the sheet without a portrait.
+`skills` keys must be normalized skill names present in
+`scripts/fill_character_sheet.py`'s `SKILL_GOVERNING_STAT` (60 entries covering
+the sheet's primary skill list, each mapped to the stat it rolls against) or
+one of `CATEGORY_SKILLS` — "Local Expert" and "Play Instrument" are CPR "pick
+a specialization" skills, so name the specific area/instrument in parens, e.g.
+`"Local Expert (Combat Zone)"` or `"Play Instrument (Guitar)"` — the script
+raises an error naming any skill you use that isn't in either set, so treat
+that as a sign to pick a different/adjacent skill name rather than inventing
+one. You only list the skills a character has *trained* (level > 0); the sheet
+prints the **full** CPR skill list regardless — trained skills are highlighted,
+and every untrained skill is shown dimmed at its base total (its governing stat,
+level 0), since it's still rollable. Each skill's LVL and rolled TOTAL
+(stat + level) are printed automatically — don't compute or write the total
+yourself.
+
+`reputation` defaults to 2 (CPR's starting Reputation for a new character) if
+omitted. `seriously_wounded` (Seriously Wounded Threshold) and `death_save`
+are computed automatically from `hp.max` and `stats.BODY` — don't add them to
+the JSON. The following sections print only when their (optional) key is
+present, so omit any that don't apply: `cyberware` (list of `{name, effect}`),
+`gear` (list of `{name, notes}`), `addictions` (free-text string), `money`
+(any of `cash`/`rent`/`housing`/`lifestyle`), and `ip` (Improvement Points,
+`{current, total}`).
 
 ```json
 {
   "handle": "string",
+  "style_preset": "cpr-rulebook | pulp-2020 | night-city-cinematic | edgerunners-anime | chrome-noir",
   "role": "string (one of the 10 CPR Role names, English)",
   "role_ability": "string",
   "role_ability_rank": 4,
@@ -135,31 +205,21 @@ name rather than inventing a field.
   "hp": {"current": 35, "max": 35},
   "humanity": {"current": 50, "max": 50},
   "luck": {"current": 5, "max": 5},
+  "reputation": 2,
   "skills": {"Athletics": 4, "Shoulder Arms": 6},
   "weapons": [{"name": "Medium Pistol", "dmg": "2d6", "ammo": "10(c)", "rof": "2", "notes": ""}],
   "armor": {"head": {"sp": 0, "penalty": 0}, "body": {"sp": 11, "penalty": 0}, "shield": {"sp": 0, "penalty": 0}},
+  "cyberware": [{"name": "Cybereye (Infrared)", "effect": "string"}],
+  "gear": [{"name": "Agent (Pocket-KI)", "notes": "string"}],
+  "money": {"cash": 500, "rent": 200, "housing": "string", "lifestyle": "string"},
+  "ip": {"current": 0, "total": 0},
+  "addictions": "string",
   "fashion": "string",
   "role_specific_lifepath": "string",
   "notes": "string",
-  "portrait_image_path": "optional/path/to/portrait.png, or null"
+  "portrait_image_path": "characters/<handle-slug>-portrait.png (produced at the Step-5b checkpoint), or null to skip"
 }
 ```
-
-Known constraint: the sheet's text fields do not auto-shrink, so a value that is
-too long for its printed box is silently clipped in the rendered PDF (the stored
-data stays correct — only the print is cut off). Keep `handle` to roughly 18
-characters and `role_ability` to roughly 11 (e.g. "Combat Awareness" prints as
-"Combat Awar"); wide or all-caps text clips even sooner, and German text tends to
-run longer than English, so lean toward brevity.
-
-Known constraint: umlauts (ä/ö/ü) in `weapons[].name`, `weapons[].notes`,
-`fashion`, and `role_specific_lifepath` render correctly in mupdf-family viewers
-(mutool, zathura) but may render as blank/mangled in poppler-based viewers
-(evince, Okular) — a font-encoding limitation baked into the official PDF's
-per-field widget resources, not something this skill's fill step can fix. The
-stored field data is always correct regardless of viewer; only some renderers
-mis-display it. Mention this to the GM if they use evince/Okular and see garbled
-weapon names or fashion text.
 
 ## Step 6: Generate the scenario as the GM guide
 
@@ -189,7 +249,7 @@ no portrait-specific additions needed unless it's a portrait-framed NPC image).
 ### Mook JSON Schema
 
 All fields required except `weapons` entries beyond the first, which may be
-omitted (the sheet has 4 weapon slots; unused ones are simply left blank).
+omitted — the sheet's weapon table grows to fit however many entries you give it.
 
 ```json
 {
@@ -241,8 +301,8 @@ GM guide (German — the single scenario-plus-GM-notes document from Step 6, clo
 out with Step 10's gaps section) at the folder root, and an `image-prompts/`
 subfolder. When a document in a subfolder points at a file in another subfolder,
 use a correct relative path (e.g. the GM guide at the root links `npcs/…` and
-`image-prompts/…`; an NPC file under `npcs/` links `../image-prompts/…`). If any PDF fill step
-fails, report the failing field name and fall back to delivering that
+`image-prompts/…`; an NPC file under `npcs/` links `../image-prompts/…`). If any PDF render step
+fails, report the error and fall back to delivering that
 character's Markdown sheet only — never silently ship an incomplete PDF without
 saying so.
 

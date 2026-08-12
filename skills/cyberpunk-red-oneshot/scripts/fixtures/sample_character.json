@@ -12,6 +12,14 @@
     {"name": "Medium Pistol", "dmg": "2d6", "ammo": "10(c)", "rof": "2", "notes": ""}
   ],
   "armor": {"head": {"sp": 0, "penalty": 0}, "body": {"sp": 11, "penalty": 0}, "shield": {"sp": 0, "penalty": 0}},
+  "gear": [
+    {"name": "Agent (Pocket-KI)", "notes": "Verschlüsselte Comms"},
+    {"name": "Medtech-Bag", "notes": "5x Erste-Hilfe"},
+    {"name": "Flashlight", "notes": ""}
+  ],
+  "money": {"cash": 500, "rent": 200, "housing": "Conapt-Kabine", "lifestyle": "Kestrel"},
+  "ip": {"current": 0, "total": 0},
+  "addictions": "Keine bekannt",
   "fashion": "Abgewetzte Lederjacke, Militärstiefel",
   "role_specific_lifepath": "Ehemaliger Corp-Soldat, im Streit mit seiner alten Einheit gebrochen.",
   "notes": "Mistraut Corps zutiefst.",

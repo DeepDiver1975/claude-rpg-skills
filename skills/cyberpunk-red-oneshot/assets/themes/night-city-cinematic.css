@@ -1,0 +1,28 @@
+/* Theme: Night City Cinematic (2077-inspired). Print-friendly light page that
+   keeps the glossy key-art identity through neon accents — cyan / magenta / gold
+   — and a techy display (Chakra Petch). Treatment: a cyan→magenta neon header
+   sweep. */
+@font-face {
+  font-family: "Chakra Petch";
+  font-weight: 400;
+  src: url("__FONT:ChakraPetch-Bold.ttf__");
+}
+
+:root {
+  --font-display: "Chakra Petch", sans-serif;
+  --font-body: "Noto Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #12191f;
+  --paper: #eef3f6;
+  --accent: #08a5c4;
+  --accent-2: #d6136e;
+  --alert: #d11f2d;
+  --muted: #5a6b76;
+  --hairline: #cdd8de;
+  --on-accent: #06222b;
+}
+
+.hazard-stripe {
+  background: linear-gradient(90deg, #00c4e0 0%, #7a3cff 50%, #ff2d95 100%);
+}

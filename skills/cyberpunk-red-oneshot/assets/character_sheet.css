@@ -1,0 +1,295 @@
+/* Structure-only stylesheet for the character sheet. Palette and the display
+   font come from a theme file (assets/themes/<preset>.css) composed ahead of
+   this one at render time (see render_pdf.load_themed_css). Below this font
+   block the rules only reference theme tokens, never a hardcoded color or font:
+     fonts   --font-display  --font-body  --font-mono
+     colors  --ink  --paper  --accent  --accent-2  --alert  --muted  --hairline
+   The body/mono faces are bundled here because every preset reuses them; a theme
+   that wants a different body/mono declares its own @font-face and repoints the
+   token. Each theme supplies its own --font-display face. */
+@font-face {
+  font-family: "Noto Sans";
+  font-weight: 400;
+  src: url("__FONT:NotoSans-Regular.ttf__");
+}
+@font-face {
+  font-family: "Noto Sans";
+  font-weight: 700;
+  src: url("__FONT:NotoSans-Bold.ttf__");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 400;
+  src: url("__FONT:JetBrainsMono-Regular.ttf__");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 700;
+  src: url("__FONT:JetBrainsMono-Bold.ttf__");
+}
+
+@page {
+  size: A4;
+  margin: 13mm 15mm;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 10pt;
+  color: var(--ink);
+  background: var(--paper);
+  margin: 0;
+}
+
+h1, h2 { margin: 0; }
+
+/* Reusable HUD-bracket corner motif: a target-lock frame in the two corners
+   that read a box's extent at a glance (top-left/bottom-right), drawn via
+   ::before/::after so it applies cleanly to any box (portrait frame, tracker
+   chips) without extra DOM nodes. */
+.corner-frame { position: relative; }
+.corner-frame::before, .corner-frame::after {
+  content: "";
+  position: absolute;
+  width: 8pt;
+  height: 8pt;
+  border: 1.5pt solid var(--accent);
+}
+.corner-frame::before { top: -1.5pt; left: -1.5pt; border-right: none; border-bottom: none; }
+.corner-frame::after { bottom: -1.5pt; right: -1.5pt; border-left: none; border-top: none; }
+
+/* Section headers: small accent tick + tracked display caps + a plain rule —
+   the accent color is spent on the tick, not repeated across the whole rule. */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+  font-family: var(--font-display);
+  font-size: 10.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink);
+  border-bottom: 1pt solid var(--ink);
+  padding-bottom: 3pt;
+  margin-bottom: 7pt;
+}
+.section-label::before {
+  content: "";
+  width: 7pt;
+  height: 7pt;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Keep each section intact across page breaks so a section (label + body) is
+   never split mid-way — except the skill list, which is taller than a page and
+   must fragment naturally rather than jump to a fresh page and strand its
+   label. */
+section { margin-top: 13pt; break-inside: avoid; }
+.skills { break-inside: auto; }
+tr { break-inside: avoid; }
+
+/* Header */
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.identity { flex: 1; }
+.handle {
+  font-family: var(--font-display);
+  font-size: 27pt;
+  line-height: 1.05;
+}
+.role-line { margin-top: 5pt; display: flex; align-items: center; gap: 8pt; }
+.role-badge {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10pt;
+  padding: 3pt 8pt;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.role-ability { font-size: 10.5pt; color: var(--muted); }
+.portrait-box {
+  width: 32mm;
+  height: 40mm;
+  flex-shrink: 0;
+  margin-left: 10pt;
+  padding: 3pt;
+}
+.portrait { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+.hazard-stripe {
+  height: 6pt;
+  margin: 9pt 0 3pt;
+  background: repeating-linear-gradient(
+    135deg, var(--accent) 0, var(--accent) 8pt, var(--ink) 8pt, var(--ink) 16pt
+  );
+}
+
+/* Trackers: HP / Humanity / Luck / Reputation */
+.trackers { display: flex; gap: 7pt; margin-top: 10pt; }
+.tracker { flex: 1; padding: 7pt 8pt; text-align: center; }
+.tracker-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.tracker-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15pt;
+  margin-top: 2pt;
+}
+
+.wound-line {
+  margin-top: 6pt;
+  font-family: var(--font-mono);
+  font-size: 8.5pt;
+  color: var(--muted);
+  display: flex;
+  gap: 18pt;
+}
+.wound-line b { color: var(--alert); font-weight: 700; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6pt; }
+.stat-box {
+  padding: 5pt 4pt;
+  text-align: center;
+  border-top: 1.5pt solid var(--ink);
+  border-bottom: 0.5pt solid var(--hairline);
+}
+.stat-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15pt;
+}
+
+/* Skills table: NAME / STAT / LVL / TOTAL */
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+th, td { text-align: left; padding: 3.5pt 6pt; border-bottom: 0.5pt solid var(--hairline); }
+th {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+td.mono, th.mono { font-family: var(--font-mono); }
+
+/* Full skill list, laid out as a fragmentable two-column flow (CSS multicol,
+   not flex — flex can't break across page boundaries, which stranded the whole
+   block on a fresh page). Trained skills read at full ink; the rest (rollable
+   at base STAT) are dimmed so the whole list is present without the untrained
+   majority competing for attention. */
+.skill-list { column-count: 2; column-gap: 16pt; }
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr 22pt 30pt;
+  gap: 6pt;
+  align-items: baseline;
+  padding: 3pt 2pt;
+  border-bottom: 0.5pt solid var(--hairline);
+  break-inside: avoid;
+  font-size: 9.5pt;
+}
+.skill-row .mono { text-align: right; }
+.skill-head {
+  font-family: var(--font-display);
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+.stat-tag { color: var(--muted); }
+.skills .trained .skill-name { font-weight: 700; }
+.skills .trained .total { color: var(--accent-2); font-weight: 700; }
+.skills .untrained { color: var(--muted); }
+
+/* Resources. Short numeric values (Improvement Points, Cash, Rent) sit in
+   equal-width chips; Housing and Lifestyle are free text that would clip in a
+   narrow chip, so they render as full-width labeled lines below. */
+.resource-chips { display: flex; gap: 6pt; }
+.resource {
+  flex: 1;
+  padding: 5pt 4pt;
+  text-align: center;
+  border-top: 1.5pt solid var(--ink);
+  border-bottom: 0.5pt solid var(--hairline);
+}
+.resource-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 7pt;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.resource-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11pt;
+  margin-top: 2pt;
+}
+.resource-lines { margin-top: 7pt; }
+.resource-line {
+  display: flex;
+  gap: 10pt;
+  padding: 3pt 2pt;
+  border-bottom: 0.5pt solid var(--hairline);
+  font-size: 9.5pt;
+}
+.resource-line-label {
+  flex-shrink: 0;
+  min-width: 62pt;
+  font-family: var(--font-display);
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  padding-top: 1pt;
+}
+
+/* Free text blocks */
+.freetext-block { margin-top: 9pt; break-inside: avoid; }
+.freetext-block p { margin: 0; white-space: pre-wrap; }
+
+.crit-box {
+  border: 0.75pt solid var(--hairline);
+  padding: 6pt;
+  min-height: 18pt;
+}
+.crit-box .fill-line {
+  border-bottom: 0.5pt dotted var(--hairline);
+  height: 11pt;
+}
+.crit-box .fill-line:last-child { border-bottom: none; }
+
+footer {
+  margin-top: 10pt;
+  padding-top: 5pt;
+  border-top: 0.5pt solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 7pt;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

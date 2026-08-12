@@ -2,10 +2,11 @@
 
 A [Claude Code](https://claude.com/claude-code) skill that generates a
 complete, ready-to-run one-shot session for the Cyberpunk RED tabletop RPG:
-pregenerated Rank 0 characters as filled official character sheet PDFs (with
-portraits), a linear scenario with GM notes, NPC/enemy Mook Sheets, and a
-consistent set of image-generation prompts. See [`SKILL.md`](SKILL.md) for
-the full process the skill follows.
+pregenerated Rank 0 characters as original, self-contained character sheet
+PDFs (with portraits) generated from HTML/CSS templates, a linear scenario
+with GM notes, NPC/enemy Mook Sheets, and a consistent set of
+image-generation prompts. See [`SKILL.md`](SKILL.md) for the full process
+the skill follows.
 
 Rules content is sourced exclusively from R. Talsorian Games' free Cyberpunk
 RED Easy Mode rules (the public Roll20 Compendium) — nothing here reproduces
@@ -24,21 +25,24 @@ This project is free to use and is not for sale, per the Homebrew Content
 Policy.
 
 The policy prohibits reproducing text from R. Talsorian's games, books, or
-products. Accordingly, **this repository does not include R. Talsorian's
-official character sheet PDFs** — see Setup below for how to obtain them
-yourself, directly from R. Talsorian, before using this skill.
+products. This skill generates its own original-layout character/Mook
+sheets from HTML/CSS templates (`assets/*.html.jinja`, `assets/*.css`)
+rather than filling in R. Talsorian's own PDFs, so it does not require or
+include any of their official files.
 
 ## Setup
 
-### 1. Get the two official free PDFs
+### 1. Install requirements
 
-Download these two files yourself from R. Talsorian Games' own
-[downloadable content page](https://rtalsoriangames.com/downloadable-content/)
-and save them at these **exact filenames**, since the scripts reference them
-directly:
-
-- `assets/RTG-CPR-CharacterSheet-Fillable.pdf`
-- `assets/RTG-CPR-MooksSheetFormFillable.pdf`
+- Python 3.11+
+- `pip install -r scripts/requirements.txt` — installs WeasyPrint (HTML→PDF
+  rendering) and Jinja2 (templating), plus `pytest`, `pypdf`, and `Pillow`
+  for running the test suite.
+- WeasyPrint needs a few system libraries for text/font rendering: on
+  Debian/Ubuntu, `apt install libpango-1.0-0 libpangocairo-1.0-0
+  libgdk-pixbuf2.0-0 libffi-dev`; see the
+  [WeasyPrint install docs](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation)
+  for other platforms.
 
 ### 2. (Optional) Extract data from your own core rulebook
 
@@ -64,16 +68,7 @@ you own; the repository ships only the extraction tooling and a facts-only page 
 never R. Talsorian's content. `pdftotext`/`pdfinfo` (from `poppler-utils`) are
 required for extraction.
 
-### 3. Install requirements
-
-- `pdftk` — PDF form filling
-- ImageMagick (`magick`/`convert`) — portrait image compositing
-- `mutool` (from `mupdf-tools`) — used by the test suite to verify rendering
-- `pdftotext`/`pdfinfo` (from `poppler-utils`) — used by the optional rulebook
-  extraction in step 2
-- Python 3 and `pytest` (stdlib only otherwise — no PyPI packages required)
-
-### 4. Install the skill
+### 3. Install the skill
 
 ```bash
 ln -s "$(pwd)/skills/cyberpunk-red-oneshot" ~/.claude/skills/cyberpunk-red-oneshot
@@ -88,15 +83,18 @@ cd scripts
 pytest -v
 ```
 
-25 tests total. The Character/Mook Sheet tests read, fill, and render the
-real sheet PDFs, so they'll fail until step 1 above is done — that's
-expected, not a bug. The rulebook-extraction tests run without any PDF; their
-one real-PDF integration test skips cleanly unless you've placed
-`assets/cpr-corebook.pdf` (step 2 above).
+The Character/Mook Sheet tests are self-contained — they render HTML→PDF and
+read the result back, needing no external PDFs or system PDF tooling beyond
+WeasyPrint's own dependencies (see Setup above). The rulebook-extraction tests
+run without any PDF; their one real-PDF integration test skips cleanly unless
+you've placed `assets/cpr-corebook.pdf` (step 2 above).
 
 ## License
 
-The Python code (`scripts/*.py`) is original work. The reference material
+The Python code (`scripts/*.py`) and HTML/CSS templates (`assets/*.jinja`,
+`assets/*.css`) are original work. The bundled font
+(`assets/fonts/NotoSans-*.ttf`) is Noto Sans by Google, licensed under the
+SIL Open Font License 1.1 — see `assets/fonts/OFL.txt`. The reference material
 (`references/*.md`) is derived and paraphrased from R. Talsorian's own free,
 publicly published Cyberpunk RED Easy Mode rules, with citations back to the
 source pages — it is not a verbatim reproduction of their text, but it also

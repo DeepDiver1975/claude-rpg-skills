@@ -1,0 +1,29 @@
+/* Theme: Chrome Noir (Blade Runner 2049-inspired). Print-friendly light page in
+   a cool steel palette with muted amber and steel-blue accents and a clean
+   grotesque display (Barlow). Treatment: minimal — a single thin amber rule
+   instead of a bold stripe. */
+@font-face {
+  font-family: "Barlow";
+  font-weight: 400;
+  src: url("__FONT:Barlow-Bold.ttf__");
+}
+
+:root {
+  --font-display: "Barlow", sans-serif;
+  --font-body: "Noto Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #1c2226;
+  --paper: #eceff1;
+  --accent: #c8871f;
+  --accent-2: #3f6f93;
+  --alert: #a8412e;
+  --muted: #667079;
+  --hairline: #cbd2d7;
+  --on-accent: #16191c;
+}
+
+.hazard-stripe {
+  height: 2pt;
+  background: var(--accent);
+}
