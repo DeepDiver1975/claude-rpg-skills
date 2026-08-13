@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>{{ character.name }}</title>
+<style>{{ css | safe }}</style>
+</head>
+<body>
+  <header class="sheet-header">
+    <div class="identity">
+      <h1 class="name">{{ character.name }}</h1>
+      <div class="subline">
+        <span class="badge">{{ character.class }}{% if character.subclass %} · {{ character.subclass }}{% endif %} · Stufe {{ character.level }}</span>
+        <span class="sub-meta">{{ character.species }}{% if character.background %} · {{ character.background }}{% endif %}{% if character.alignment %} · {{ character.alignment }}{% endif %}</span>
+      </div>
+    </div>
+    {% if portrait_data_uri %}
+    <div class="portrait-box corner-frame">
+      <img class="portrait" src="{{ portrait_data_uri }}" alt="Porträt von {{ character.name }}">
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="sheet-rule"></div>
+
+  <section class="abilities">
+    <div class="section-label">Attribute</div>
+    <div class="ability-grid">
+      {% for a in abilities %}
+      <div class="ability-box">
+        <span class="ability-name">{{ a.name_de }} ({{ a.key }})</span>
+        <span class="ability-score">{{ a.score }}</span>
+        <span class="ability-mod mono">{{ a.mod }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="combat">
+    <div class="section-label">Kampfwerte</div>
+    <div class="combat-chips">
+      <div class="chip corner-frame"><span class="chip-label">Rüstungsklasse</span><span class="chip-value mono">{{ character.ac }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Trefferpunkte</span><span class="chip-value mono">{{ character.hp.current }}/{{ character.hp.max }}{% if character.hp.temp %} +{{ character.hp.temp }}{% endif %}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Initiative</span><span class="chip-value mono">{{ initiative }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Bewegungsrate</span><span class="chip-value mono">{{ character.speed }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Trefferwürfel</span><span class="chip-value mono">{{ character.hit_dice.die }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Übungsbonus</span><span class="chip-value mono">{{ proficiency_bonus }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Passive Wahrnehmung</span><span class="chip-value mono">{{ passive_perception }}</span></div>
+    </div>
+  </section>
+
+  <section class="saves">
+    <div class="section-label">Rettungswürfe</div>
+    <div class="save-grid">
+      {% for s in saves %}
+      <div class="save-row {{ 'is-prof' if s.proficient else '' }}">
+        <span class="dot">{{ '●' if s.proficient else '○' }}</span>
+        <span class="save-name">{{ s.name_de }}</span>
+        <span class="mono total">{{ s.total }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="skills">
+    <div class="section-label">Fertigkeiten</div>
+    <div class="skill-list">
+      {% for s in skills %}
+      <div class="skill-row {{ 'is-prof' if (s.proficient or s.expertise) else '' }}">
+        <span class="dot">{{ '◆' if s.expertise else '●' if s.proficient else '○' }}</span>
+        <span class="skill-name">{{ s.name_de }} <span class="ability-tag">({{ s.ability }})</span></span>
+        <span class="mono total">{{ s.total }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if weapons %}
+  <section class="attacks">
+    <div class="section-label">Angriffe</div>
+    <table>
+      <thead><tr><th>Waffe</th><th class="mono">Angriff</th><th>Schaden</th><th>Eigenschaften</th></tr></thead>
+      <tbody>
+        {% for w in weapons %}
+        <tr><td>{{ w.name }}</td><td class="mono">{{ w.attack }}</td><td class="mono">{{ w.damage }}</td><td>{{ w.properties }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+  {% if spells %}
+  <section class="spells">
+    <div class="section-label">Zauber</div>
+    <div class="combat-chips">
+      <div class="chip corner-frame"><span class="chip-label">Zauberfähigkeit</span><span class="chip-value mono">{{ spells.ability_de }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Zauber-SG</span><span class="chip-value mono">{{ spells.save_dc }}</span></div>
+      <div class="chip corner-frame"><span class="chip-label">Zauberangriff</span><span class="chip-value mono">{{ spells.attack }}</span></div>
+      {% for lvl, n in spells.slots.items() %}
+      <div class="chip corner-frame"><span class="chip-label">Plätze Grad {{ lvl }}</span><span class="chip-value mono">{{ n }}</span></div>
+      {% endfor %}
+    </div>
+    {% if spells.cantrips %}
+    <div class="spell-line"><span class="spell-line-label">Zaubertricks</span><span>{{ spells.cantrips | join(' · ') }}</span></div>
+    {% endif %}
+    {% if spells.spells %}
+    <div class="spell-line"><span class="spell-line-label">Zauber (Grad 1)</span><span>{{ spells.spells | join(' · ') }}</span></div>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <section class="gear">
+    <div class="section-label">Ausrüstung &amp; Münzen</div>
+    {% if character.equipment %}
+    <ul class="gear-list">
+      {% for item in character.equipment %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    <div class="coins mono">
+      {% for denom, label in [('pp','PM'),('gp','GM'),('ep','EM'),('sp','SM'),('cp','KM')] %}
+      {% if coins.get(denom) %}<span class="coin">{{ coins[denom] }} {{ label }}</span>{% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if character.features_and_traits %}
+  <section class="features">
+    <div class="section-label">Merkmale &amp; Eigenschaften</div>
+    <ul class="feature-list">
+      {% for f in character.features_and_traits %}<li>{{ f }}</li>{% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="freetext">
+    {% for label, value in [
+      ('Persönlichkeit', character.personality_traits),
+      ('Ideale', character.ideals),
+      ('Bindungen', character.bonds),
+      ('Makel', character.flaws),
+      ('Hintergrund', character.backstory)] %}
+    {% if value %}
+    <div class="freetext-block">
+      <div class="section-label">{{ label }}</div>
+      <p>{{ value }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </section>
+
+  <footer>D&amp;D 5e // Stufe-1-Charakterbogen // SRD 5.2.1</footer>
+</body>
+</html>

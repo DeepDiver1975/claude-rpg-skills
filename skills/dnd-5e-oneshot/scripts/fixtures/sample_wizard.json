@@ -1,0 +1,37 @@
+{
+  "name": "Runa",
+  "species": "Mensch",
+  "class": "Magier",
+  "subclass": "Hervorrufer",
+  "level": 1,
+  "background": "Gelehrter",
+  "alignment": "Neutral Gut",
+  "ability_scores": {"STR": 8, "DEX": 14, "CON": 13, "INT": 16, "WIS": 12, "CHA": 10},
+  "proficiency_bonus": 2,
+  "hp": {"current": 7, "max": 7, "temp": 0},
+  "hit_dice": {"die": "1d6", "total": 1},
+  "ac": 12,
+  "speed": 30,
+  "saving_throw_proficiencies": ["INT", "WIS"],
+  "skill_proficiencies": ["Arcana", "Investigation"],
+  "skill_expertise": [],
+  "weapons": [
+    {"name": "Dolch", "attack_ability": "DEX", "damage_die": "1d4", "damage_type": "Stichschaden", "properties": "Fingerfertig, Leicht, Wurfwaffe", "mastery": "Kerbe"}
+  ],
+  "armor": {"name": "Keine", "ac_base": 12, "stealth_disadvantage": false},
+  "equipment": ["Zauberbuch", "Komponentenbeutel", "Gelehrtenausrüstung"],
+  "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 5, "pp": 0},
+  "features_and_traits": ["Arkane Wiederherstellung (1/Tag, Zauberplätze nach kurzer Rast zurückgewinnen)", "Ritualzauberei", "Hervorrufung: Zauberkundige Hervorrufung"],
+  "spellcasting": {
+    "ability": "INT",
+    "cantrips": ["Feuerpfeil", "Magierhand", "Licht"],
+    "spells_known_or_prepared": ["Magisches Geschoss", "Schild", "Schlaf"],
+    "spell_slots": {"1": 2}
+  },
+  "personality_traits": "Notiert alles in einem abgegriffenen Feldbuch und stellt eine Frage zu viel.",
+  "ideals": "Wissen. Jedes Rätsel ist dazu da, gelöst zu werden.",
+  "bonds": "Sucht die verschollene Bibliothek, in der ihre Mentorin zuletzt gesehen wurde.",
+  "flaws": "Überschätzt regelmäßig, wie viel Zeit ein Zauber ihr verschafft.",
+  "backstory": "In der Gelehrtenstadt Weißfurt ausgebildet, brach Runa auf, um Magie im Feld statt nur in Büchern zu erproben.",
+  "portrait_image_path": null
+}

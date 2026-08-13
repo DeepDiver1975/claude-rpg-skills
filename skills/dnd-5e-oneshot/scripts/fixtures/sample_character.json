@@ -1,11 +1,11 @@
 {
   "name": "Rurik",
-  "species": "Dwarf",
-  "class": "Fighter",
+  "species": "Zwerg",
+  "class": "Kämpfer",
   "subclass": "Champion",
   "level": 1,
-  "background": "Soldier",
-  "alignment": "Lawful Good",
+  "background": "Soldat",
+  "alignment": "Rechtschaffen Gut",
   "ability_scores": {"STR": 16, "DEX": 12, "CON": 14, "INT": 10, "WIS": 13, "CHA": 8},
   "proficiency_bonus": 2,
   "hp": {"current": 13, "max": 13, "temp": 0},
@@ -16,17 +16,17 @@
   "skill_proficiencies": ["Athletics", "Intimidation"],
   "skill_expertise": [],
   "weapons": [
-    {"name": "Longsword", "attack_ability": "STR", "damage_die": "1d8", "damage_type": "slashing", "properties": "Versatile (1d10)", "mastery": "Sap"}
+    {"name": "Langschwert", "attack_ability": "STR", "damage_die": "1d8", "damage_type": "Hiebschaden", "properties": "Vielseitig (1d10)", "mastery": "Schwächen"}
   ],
-  "armor": {"name": "Chain Mail", "ac_base": 16, "stealth_disadvantage": true},
-  "equipment": ["Shield", "6 Javelins", "Explorer's Pack"],
+  "armor": {"name": "Kettenpanzer", "ac_base": 16, "stealth_disadvantage": true},
+  "equipment": ["Schild", "6 Wurfspeere", "Entdeckerausrüstung"],
   "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 9, "pp": 0},
-  "features_and_traits": ["Fighting Style: Defense (+1 AC while wearing armor)", "Second Wind (Bonus Action, 1/rest, heal 1d10+1)", "Weapon Mastery: Longsword (Sap), Javelin (Slow)", "Dwarven Resilience, Dwarven Toughness, Stonecunning"],
+  "features_and_traits": ["Kampfstil: Verteidigung (+1 RK in Rüstung)", "Zweiter Wind (Bonusaktion, 1/Rast, heilt 1W10+1)", "Waffenmeisterschaft: Langschwert (Schwächen), Wurfspeer (Verlangsamen)", "Zwergische Widerstandskraft, Zwergische Zähigkeit, Steinkunde"],
   "spellcasting": null,
   "personality_traits": "Ruhig und bedächtig, bis jemand seine Familie beleidigt – dann wird er laut.",
   "ideals": "Ehre. Ein gegebenes Wort ist ein gegebenes Wort.",
   "bonds": "Sein Großvater fiel in den Minen von Ödengrund; er trägt dessen Kriegshammer als Andenken.",
   "flaws": "Misstraut Magiern grundsätzlich, auch wohlmeinenden.",
-  "backstory": "Rurik wuchs in einer Söldnerkompanie südlich von Österreich auf und lernte das Kämpfen, bevor er lesen konnte.",
+  "backstory": "Rurik wuchs in einer Söldnerkompanie am Rand der Talgrund-Lande auf und lernte das Kämpfen, bevor er lesen konnte.",
   "portrait_image_path": null
 }

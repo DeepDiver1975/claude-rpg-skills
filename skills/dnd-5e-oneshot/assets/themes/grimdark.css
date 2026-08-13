@@ -1,0 +1,29 @@
+/* Theme: Moody Grimdark. Cold light-grey page, blood-red + charcoal accents, a
+   blackletter display (Pirata One). Treatment: a solid dark header rule and hard
+   square section ticks. */
+@font-face {
+  font-family: "Pirata One";
+  font-weight: 400;
+  src: url("__FONT:PirataOne-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Pirata One", serif;
+  --font-body: "Crimson Text", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #201f1e;
+  --paper: #eceae6;
+  --accent: #7a1414;
+  --accent-2: #4a4640;
+  --alert: #7a1414;
+  --muted: #6b6862;
+  --hairline: #cbc8c2;
+  --on-accent: #efe9e2;
+}
+
+.sheet-rule {
+  height: 3pt;
+  background: var(--ink);
+}
+.section-label::before { transform: none; }

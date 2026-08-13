@@ -1,0 +1,22 @@
+/* Theme: Cinematic BG3-Style. Cool stone page, gold + deep-teal accents, a
+   classic roman-caps display (Marcellus). */
+@font-face {
+  font-family: "Marcellus";
+  font-weight: 400;
+  src: url("__FONT:Marcellus-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Marcellus", serif;
+  --font-body: "Crimson Text", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #22262a;
+  --paper: #eef0ec;
+  --accent: #b58a3c;
+  --accent-2: #2f6d6a;
+  --alert: #a23a2a;
+  --muted: #6d7680;
+  --hairline: #ccd2cf;
+  --on-accent: #1c1a12;
+}

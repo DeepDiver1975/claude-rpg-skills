@@ -6,8 +6,9 @@ description: Use when the user wants to run a D&D 5e (2024 rules / SRD 5.2.1) on
 # D&D 5e One-Shot Generator
 
 Generates a complete, ready-to-run D&D 5e (2024 rules) one-shot for a 3-6
-player group: pregenerated level 1 characters as filled official PDF sheets
-(with portraits) plus Markdown, a linear scenario with GM notes, NPC/monster
+player group: pregenerated level 1 characters as original German
+character-sheet PDFs (with portraits, rendered from HTML/CSS templates) plus
+Markdown, a linear scenario with GM notes, NPC/monster
 Markdown stat blocks, and a consistent set of image prompts. The GM plays
 this in German; every deliverable this skill writes for players/GM must be
 German — that includes class/subclass/species/background names,
@@ -66,6 +67,12 @@ Classic PHB Illustration. Use this preset's base style block for every
 image prompt generated later in this run (Steps 5, 7, 8) — do not mix
 presets within a single one-shot.
 
+The same preset also **themes the character sheets** (palette + display font),
+so the sheet matches its art. Record the preset's **key** and put it in every
+PC's `style_preset` field (Step 5): Classic PHB → `classic-phb`, Painterly
+Classic Fantasy → `painterly`, Cinematic BG3-Style → `bg3-cinematic`, Flat-Color
+Animated → `flat-animated`, Moody Grimdark → `grimdark`.
+
 ## Step 3: Generate the party's shared adventuring hook
 
 Write a shared hook: how this specific party already knows and trusts each
@@ -88,51 +95,77 @@ subclass other than the SRD's listed one is a Step 10 gap.
 
 ## Step 5: Generate each PC
 
+The sheet is an original HTML/CSS design rendered to PDF (WeasyPrint) — no
+Wizards of the Coast PDF is involved — and it embeds the PC's portrait, which
+doesn't exist until the GM generates it from the prompt. So PC creation is
+split into two phases with a **stop in between**: author the characters and
+their portrait prompts first, wait for the GM to supply the images, then render.
+
+### Step 5a — Author each PC and its portrait prompt (no PDF yet)
+
 For each PC, using `references/dnd5e-rules-summary.md` (core mechanics/DC
 ladder/skills), `references/classes-and-subclasses.md` (class features),
 `references/species-and-backgrounds.md` (species/background), and
-`references/equipment.md` (starting gear) — plus `references/
-spellcasting-summary.md` for any caster: write level 1 ability
-scores/features/gear, a background-flavored German backstory tied to the
-crew concept and to the scenario, and a portrait image prompt built from
-the GM's selected style preset (Step 2) in `references/style-guide.md` plus
-its universal "Portrait-Specific Additions". Assemble a character JSON
-matching the **Character JSON Schema** below, write it to the run's output
-folder, then run:
+`references/equipment.md` (starting gear) — plus
+`references/spellcasting-summary.md` for any caster: write level 1 ability
+scores/features/gear and a background-flavored German backstory tied to the
+crew concept and scenario. Then, per PC:
+
+- Write the character JSON to `characters/<name-slug>.json`, matching the
+  **Character JSON Schema** below. Set `style_preset` to the run's Step-2 preset
+  key, and `portrait_image_path` to the **expected** file the GM will produce —
+  `characters/<name-slug>-portrait.png` — even though it doesn't exist yet
+  (or `null` to opt this PC out of a portrait).
+- Write the portrait prompt to `image-prompts/portrait-<name-slug>.txt`, built
+  from the GM's selected style preset (Step 2) in `references/style-guide.md`
+  plus its universal "Portrait-Specific Additions".
+- Write a Markdown version of the character for quick reference.
+
+**Do not run `fill_character_sheet.py` yet** — the sheet would fail on the
+missing portrait (that failure is deliberate).
+
+### Step 5b — Checkpoint: wait for the GM's portrait images
+
+Stop and hand the GM the portrait prompts. Ask them to run each through their
+image tool and save the result to the expected path
+(`characters/<name-slug>-portrait.png`), then tell you to continue. Do not
+render until the GM confirms the images are in place.
+
+### Step 5c — Render the themed sheets (after images are supplied)
 
 ```bash
-python3 scripts/fill_character_sheet.py <character.json> <output-folder>/<name-slug>.pdf
+python3 scripts/fill_character_sheet.py characters/<name-slug>.json <output-folder>/characters/<name-slug>.pdf
 ```
 
-Portrait compositing is driven by the `portrait_image_path` key in the JSON
-itself (set it to the portrait file's path before running the command
-above, or leave it `null` to skip — there is no separate CLI flag for
-this). `fill_character_sheet.py` computes every derived number itself
-(ability modifiers, save/skill totals, initiative, passive Perception,
-spell save DC/attack bonus) from the raw ability scores and proficiency
-lists in the JSON — don't pre-compute these in the JSON, the script owns
-that arithmetic.
-
-Also write a Markdown version of the same character for quick reference.
+`fill_character_sheet.py` computes every derived number itself (ability
+modifiers, save/skill totals, initiative, passive Perception, spell save
+DC/attack bonus) from the raw scores and proficiency lists — don't pre-compute
+these in the JSON. The sheet is themed by the JSON's `style_preset` (default
+`classic-phb`; unknown value errors) and embeds the portrait from
+`portrait_image_path`; a path whose file is missing errors clearly (report which
+portrait is missing rather than shipping a sheet without it), while `null`
+renders without a portrait.
 
 ### Character JSON Schema
 
 All keys required except `alignment` (optional flavor — 2024 rules
-de-emphasize it), `spellcasting` (`null` for non-casters), and
-`portrait_image_path`.
+de-emphasize it), `spellcasting` (`null` for non-casters), `style_preset`
+(defaults to `classic-phb`), and `portrait_image_path`.
+
+`style_preset` is the run's Step-2 preset key (`classic-phb`, `painterly`,
+`bg3-cinematic`, `flat-animated`, or `grimdark`); it themes the sheet's palette
+and display font and defaults to `classic-phb` if omitted — an unknown value
+errors.
 
 **Which fields stay English and which are German**: only
 `saving_throw_proficiencies`, `skill_proficiencies`, and `skill_expertise`
-must stay the SRD's literal English terms — `fill_character_sheet.py`
-looks these up by exact name (`skills_field_map.json`, `SKILL_ABILITY`), so
-translating them breaks the script. `class`, `subclass`, `species`, and
-`background` are, perhaps surprisingly, **not** looked up anywhere in the
-script — it writes them straight into `ClassLevel`/`Race `/`Background`
-with zero parsing — so there's no mechanical reason to keep them English,
-and they should be the German term from `references/german-terminology.md`
-or `references/classes-and-subclasses.md` (e.g. "Kämpfer", "Zwerg",
-"Soldat", "Domäne des Lebens" for `subclass`), matching what actually ends
-up on the PDF and Markdown sheet.
+must stay the SRD's literal English terms — `fill_character_sheet.py` looks
+these up by exact name (`SKILL_ABILITY`) and renders the German skill/ability
+name for display, so translating the keys breaks the lookup. Everything else is
+display text the script never parses, so write it in German: `class`,
+`subclass`, `species`, and `background` (from `references/german-terminology.md`
+or `references/classes-and-subclasses.md`, e.g. "Kämpfer", "Zwerg", "Soldat",
+"Domäne des Lebens" for `subclass`).
 `weapons[].name`/`.properties`/`.mastery`/`.damage_type`, `armor.name`,
 `equipment[]`, and `features_and_traits[]` are pure display text the
 script never parses either, so write those in German too. The example
@@ -141,6 +174,7 @@ below shows all of this together:
 ```json
 {
   "name": "string",
+  "style_preset": "classic-phb | painterly | bg3-cinematic | flat-animated | grimdark",
   "species": "string (German term, e.g. \"Zwerg\" — see german-terminology.md)",
   "class": "string (German term, e.g. \"Kämpfer\")",
   "subclass": "string (German term from classes-and-subclasses.md, e.g. \"Domäne des Lebens\")",
@@ -186,62 +220,20 @@ the official German SRD PDF (or `data/raw/spells.txt`, if the extraction
 in `references/extraction-map-de.md` has been run) before using it, rather
 than guessing; that's a Step 10 gap like any other unverified term.
 
-`skill_proficiencies`/`skill_expertise` keys must be normalized skill names
-present in `assets/skills_field_map.json` (the 18 SRD skills) — the script
-raises an error naming any skill you use that isn't in that map. This is
-the one place the English JSON term doesn't automatically become German
-output: the PDF's own printed skill labels are unavoidably English (see the
-next constraint below), and the **Markdown sheet's skill line should show
-the German term from `references/german-terminology.md` with the English
-SRD term in parentheses**, e.g. "Athletik (Athletics) +5" — write it that
-way explicitly, don't just copy the JSON's `"Athletics"` into the Markdown
-verbatim.
+`skill_proficiencies`/`skill_expertise` keys must be the SRD's literal
+English skill names (the 18 in `fill_character_sheet.py`'s `SKILL_ABILITY`);
+the script keys off them for the governing ability and renders the German
+skill name (from `SKILL_DE`) on the sheet automatically — a proficient skill
+gets a filled ● (● dot, ◆ for expertise) and its total already includes the
+Proficiency Bonus. Write the Markdown sheet's skill line as the German term
+with the English SRD term in parentheses, e.g. "Athletik (Athletics) +5", so
+the GM can still cross-reference the English `references/*`.
 
-**Known constraint — sheet is 2014-layout, data is 2024/SRD-5.2.1**: the
-official fillable PDF this skill uses
-(`assets/5E_CharacterSheet_Fillable.pdf`) is the 2014-rules character sheet
-— it was the only official, genuinely form-fillable (AcroForm) sheet
-available; the newer 2024-rules PDF has no real form fields at all, only
-Acrobat "Fill & Sign" support, which this skill's `pdftk`-based pipeline
-can't drive. Practically this means: a 2024 "Species" value is written into
-the sheet's own field literally named `Race ` (trailing space preserved,
-this is the actual PDF field name); Weapon Mastery properties have no
-dedicated column on this sheet, so they're folded into the weapon's Name
-field in parentheses instead. Both are handled automatically by
-`fill_character_sheet.py` — no action needed when writing the JSON, just be
-aware the printed PDF's field label still literally says "RACE" in English
-(unavoidable, it's baked into the sheet's artwork) even though the value
-printed next to it — the character's `species`, per the schema above — is
-written in German (e.g. "Zwerg"), same as `class`/`background`. Only the
-field's own printed label is stuck in English; everything this skill
-actually writes into the page (species/class/subclass/background values,
-weapon names, equipment, features, backstory, personality) is German.
-
-**Known constraint — text fields auto-shrink, they don't clip**: unlike the
-Cyberpunk RED skill's character sheet (which hard-clips overlong text),
-this sheet's text fields are set to auto-size their font, so long values
-shrink to fit rather than getting cut off — but an entire paragraph crammed
-into a short field (e.g. `ClassLevel`, `Background`) will render at a
-barely-legible tiny size. Keep short fields short; reserve full sentences
-for `backstory`/`features_and_traits`, which map to generously sized boxes.
-The Markdown sheet is always the reliable fallback for anything that prints
-too small to read comfortably.
-
-**Known constraint — skill/save proficiency checkboxes are not filled**:
-this sheet has 124 checkbox fields (mostly skill/save proficiency dots),
-many with generic, non-descriptive names (e.g. `Check Box 12`) that would
-require positional/rect analysis rather than name matching to map
-correctly. `fill_character_sheet.py` deliberately skips them in v1 —
-proficiency is still fully reflected in each skill/save's printed *total*
-(the computed number already includes the Proficiency Bonus where
-applicable), and the Markdown sheet lists which skills/saves are proficient
-explicitly. Don't try to hand-edit the checkboxes in the JSON; there's no
-field for them.
-
-**Known constraint — only 3 weapon rows**: the sheet has 3 attack rows
-(`Wpn Name`/`Wpn Name 2`/`Wpn Name 3`), one fewer than the Cyberpunk RED
-sheet's 4. If a PC has more than 3 weapons, only the first 3 are filled on
-the PDF; the Markdown sheet always lists all of them.
+The sheet is an original HTML/CSS design, so the old AcroForm limitations are
+gone: every label is German (nothing baked into a publisher's artwork), text
+wraps/grows instead of clipping or auto-shrinking, proficiency is shown by the
+● / ◆ dots, and the attacks/equipment/features/spells sections grow to fit
+however many entries a PC has.
 
 ## Step 6: Generate the scenario as the GM guide
 
