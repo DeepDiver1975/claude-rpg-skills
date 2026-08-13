@@ -2,8 +2,9 @@
 
 A [Claude Code](https://claude.com/claude-code) skill that generates a
 complete, ready-to-run one-shot session for D&D 5e (2024 rules): pregenerated
-level 1 characters as filled official character sheet PDFs (with portraits),
-a linear scenario with GM notes, NPC/monster Markdown stat blocks, and a
+level 1 characters as original, self-contained character-sheet PDFs (German,
+with portraits, rendered from HTML/CSS templates), a linear scenario with GM
+notes, NPC/monster Markdown stat blocks, and a
 consistent set of image-generation prompts. See [`SKILL.md`](SKILL.md) for
 the full process the skill follows.
 
@@ -23,28 +24,24 @@ This is unofficial, fan-made content. It is not affiliated with, endorsed
 by, or reviewed by Wizards of the Coast. Dungeons & Dragons, D&D, Wizards of
 the Coast, and their logos are trademarks of Wizards of the Coast LLC.
 
-**This repository does not include Wizards of the Coast's official
-character sheet PDF** — see Setup below for how to obtain it yourself,
-directly from Wizards of the Coast, before using this skill.
+This skill renders its **own** original character-sheet design from HTML/CSS
+templates (`assets/character_sheet.html.jinja` + `assets/*.css`) — it does not
+require or include any Wizards of the Coast PDF.
 
 ## Setup
 
-### 1. Get the official fillable character sheet PDF
+### 1. Install requirements
 
-Download this file yourself and save it at this **exact filename**, since
-the scripts reference it directly:
-
-- `assets/5E_CharacterSheet_Fillable.pdf` — from
-  <https://media.wizards.com/2016/dnd/downloads/5E_CharacterSheet_Fillable.pdf>
-
-This is the 2014-rules character sheet layout — it's the only official D&D
-5e character sheet PDF that's a genuine fillable AcroForm (the newer
-2024-rules PDF has no real form fields, only Acrobat "Fill & Sign" support,
-which this skill's `pdftk`-based pipeline can't drive). `fill_character_sheet.py`
-maps 2024/SRD-5.2.1 character data onto this sheet's field names; see
-`SKILL.md`'s "Known constraint" notes for the practical implications (e.g. a
-2024 "Species" value is written into the sheet's own field literally named
-`Race `).
+- Python 3.11+
+- `pip install -r scripts/requirements.txt` — installs WeasyPrint (HTML→PDF
+  rendering) and Jinja2 (templating), plus `pytest`, `pypdf`, and `Pillow`
+  for the test suite.
+- WeasyPrint needs a few system libraries for text/font rendering: on
+  Debian/Ubuntu, `apt install libpango-1.0-0 libpangocairo-1.0-0
+  libgdk-pixbuf2.0-0 libffi-dev`; see the
+  [WeasyPrint install docs](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation)
+  for other platforms. `pdftotext`/`pdfinfo` (from `poppler-utils`) are only
+  needed for step 2's optional extraction.
 
 ### 2. (Optional) Get the official German SRD PDF, to re-verify/extend terminology
 
@@ -75,16 +72,7 @@ files against `references/extraction-map-de.md` to update
 `references/german-terminology.md`, `classes-and-subclasses.md`, or
 `spellcasting-summary.md`.
 
-### 4. Install requirements
-
-- `pdftk` — PDF form filling
-- ImageMagick (`magick`/`convert`) — portrait image compositing
-- `mutool` (from `mupdf-tools`) — used by the test suite to verify rendering
-- `pdftotext`/`pdfinfo` (from `poppler-utils`) — only needed for step 2's
-  extraction script
-- Python 3 and `pytest` (stdlib only otherwise — no PyPI packages required)
-
-### 5. Install the skill
+### 3. Install the skill
 
 ```bash
 ln -s "$(pwd)/skills/dnd-5e-oneshot" ~/.claude/skills/dnd-5e-oneshot
@@ -99,16 +87,19 @@ cd scripts
 pytest -v
 ```
 
-33 tests total. Most of them fill and render the real character sheet PDF,
-so they'll fail until step 1 above is done — that's expected, not a bug.
-The two `test_terminology_de.py` tests don't need any PDF; they just check
-that `references/classes-and-subclasses.md` and
+The character-sheet tests are self-contained — they render HTML→PDF and read
+the result back, needing no external PDF or system PDF tooling beyond
+WeasyPrint's own dependencies (see Setup). The `test_terminology_de.py` tests
+check that `references/classes-and-subclasses.md` and
 `references/spellcasting-summary.md` stay in sync with
 `references/german-terminology.md`.
 
 ## License
 
-The Python code (`scripts/*.py`) is original work. The reference material
+The Python code (`scripts/*.py`) and the HTML/CSS sheet templates
+(`assets/character_sheet.*`, `assets/themes/*.css`) are original work; the
+bundled fonts (`assets/fonts/*.ttf`) are SIL OFL 1.1 (each family's `OFL-*.txt`
+is included). The reference material
 (`references/*.md`) is summarized/rewritten from the System Reference
 Document 5.2.1 by Wizards of the Coast LLC, licensed under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — each file cites
@@ -116,6 +107,4 @@ its source per that license's attribution requirement.
 `references/german-terminology.md` and the German subclass/spell names in
 `classes-and-subclasses.md`/`spellcasting-summary.md` are sourced from the
 official German translation of the same SRD 5.2.1, under the same license
-(see `references/extraction-map-de.md`). The official character sheet PDF
-(not included, see Setup) remains Wizards of the Coast's own copyrighted
-work, provided by them free for personal use.
+(see `references/extraction-map-de.md`).

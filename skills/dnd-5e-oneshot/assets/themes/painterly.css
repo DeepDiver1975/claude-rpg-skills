@@ -1,0 +1,22 @@
+/* Theme: Painterly Classic Fantasy. Warm off-white page, terracotta + muted
+   sage accents, an elegant display serif (Gilda Display). */
+@font-face {
+  font-family: "Gilda Display";
+  font-weight: 400;
+  src: url("__FONT:GildaDisplay-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Gilda Display", serif;
+  --font-body: "Crimson Text", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #33291f;
+  --paper: #f4efe4;
+  --accent: #8a5a3c;
+  --accent-2: #4a6b5a;
+  --alert: #9a4030;
+  --muted: #857866;
+  --hairline: #d6cbb6;
+  --on-accent: #f6efdc;
+}

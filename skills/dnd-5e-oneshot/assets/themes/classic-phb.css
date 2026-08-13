@@ -1,0 +1,23 @@
+/* Theme: Classic PHB Illustration (default). Parchment page, deep-red and
+   antique-gold accents, an old-book display face (IM Fell English SC). Light and
+   print-friendly. */
+@font-face {
+  font-family: "IM Fell English SC";
+  font-weight: 400;
+  src: url("__FONT:IMFellEnglishSC-Regular.ttf__");
+}
+
+:root {
+  --font-display: "IM Fell English SC", serif;
+  --font-body: "Crimson Text", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #2a2118;
+  --paper: #f3ead2;
+  --accent: #7a1f1f;
+  --accent-2: #6b5324;
+  --alert: #9a2b1e;
+  --muted: #7c6f57;
+  --hairline: #cbbd98;
+  --on-accent: #f6efdc;
+}

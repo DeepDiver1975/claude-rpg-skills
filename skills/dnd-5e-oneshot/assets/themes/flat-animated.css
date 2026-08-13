@@ -1,0 +1,29 @@
+/* Theme: Flat-Color Animated-Series. Bright cream page, bold orange + teal
+   accents, a friendly slab display (Patua One). Treatment: a flat solid header
+   bar instead of the chevron rule. */
+@font-face {
+  font-family: "Patua One";
+  font-weight: 400;
+  src: url("__FONT:PatuaOne-Regular.ttf__");
+}
+
+:root {
+  --font-display: "Patua One", sans-serif;
+  --font-body: "Crimson Text", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --ink: #2a2438;
+  --paper: #fbf7ef;
+  --accent: #e8632e;
+  --accent-2: #2b8f8a;
+  --alert: #e23b5a;
+  --muted: #7a7488;
+  --hairline: #e2dccf;
+  --on-accent: #ffffff;
+}
+
+.sheet-rule {
+  height: 5pt;
+  background: var(--accent);
+}
+.section-label::before { transform: none; border-radius: 2pt; }

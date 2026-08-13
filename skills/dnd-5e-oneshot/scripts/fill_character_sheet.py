@@ -1,37 +1,53 @@
 #!/usr/bin/env python3
-"""Fill the official D&D 5e Character Sheet PDF from a character JSON file."""
+"""Render a D&D 5e (level-1) character sheet PDF from a character JSON file.
+
+The sheet is an original HTML/CSS design rendered to PDF via WeasyPrint — no
+Wizards of the Coast PDF is used. Labels are German; mechanical numbers are
+computed here from the raw ability scores + proficiency lists in the JSON, so
+the JSON never carries a modifier, total, or spell DC.
+"""
 import argparse
 import json
-import tempfile
 from pathlib import Path
 
-from pdf_form import fill_text_fields, stamp_image_on_page
+import jinja2
+
+from render_pdf import data_uri, load_themed_css, render_html_to_pdf
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
-BLANK_SHEET = SKILL_DIR / "assets" / "5E_CharacterSheet_Fillable.pdf"
-SKILLS_FIELD_MAP = json.loads(
-    (SKILL_DIR / "assets" / "skills_field_map.json").read_text(encoding="utf-8")
+ASSETS_DIR = SKILL_DIR / "assets"
+THEMES_DIR = ASSETS_DIR / "themes"
+
+_ENV = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(ASSETS_DIR),
+    autoescape=jinja2.select_autoescape(["html", "jinja"]),
 )
 
-# Empirically measured (see scripts/test_pdf_form.py) — page 2 holds the
-# personal-characteristics/backstory content, including the portrait box.
-CHARACTER_IMAGE_PAGE = 2
-CHARACTER_IMAGE_PAGE_SIZE_PT = (612.0, 792.0)
-CHARACTER_IMAGE_RECT_PT = (36.4791, 443.398, 199.172, 661.497)
+_PORTRAIT_MIME_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
+
+# Visual style presets (SKILL.md Step 2 / references/style-guide.md). Each key
+# themes the sheet's palette + display font to match the run's chosen art style;
+# the image-prompt style blocks live in references/style-guide.md, not here.
+STYLE_PRESETS = {
+    "classic-phb": "classic-phb.css",
+    "painterly": "painterly.css",
+    "bg3-cinematic": "bg3-cinematic.css",
+    "flat-animated": "flat-animated.css",
+    "grimdark": "grimdark.css",
+}
+DEFAULT_STYLE_PRESET = "classic-phb"
 
 ABILITIES = ("STR", "DEX", "CON", "INT", "WIS", "CHA")
-# This sheet's per-ability modifier fields don't follow one consistent naming
-# scheme — most are "<ABILITY>mod" but Charisma's is the sheet's own typo
-# "CHamod" (missing the second A), preserved verbatim like the CPR skill
-# preserved its own sheet's field-name quirks.
-ABILITY_MOD_FIELD = {
-    "STR": "STRmod", "DEX": "DEXmod ", "CON": "CONmod",
-    "INT": "INTmod", "WIS": "WISmod", "CHA": "CHamod",
+
+# German display names (official German SRD 5.2.1, see references/german-terminology.md).
+# The three-letter STR/DEX/… abbreviations stay English per the glossary.
+ABILITY_DE = {
+    "STR": "Stärke", "DEX": "Geschicklichkeit", "CON": "Konstitution",
+    "INT": "Intelligenz", "WIS": "Weisheit", "CHA": "Charisma",
 }
-SAVE_FIELD = {
-    "STR": "ST Strength", "DEX": "ST Dexterity", "CON": "ST Constitution",
-    "INT": "ST Intelligence", "WIS": "ST Wisdom", "CHA": "ST Charisma",
-}
+
+# The 18 SRD skills → governing ability (English keys are the JSON contract) and
+# their official German display names.
 SKILL_ABILITY = {
     "Acrobatics": "DEX", "Animal Handling": "WIS", "Arcana": "INT",
     "Athletics": "STR", "Deception": "CHA", "History": "INT",
@@ -40,15 +56,15 @@ SKILL_ABILITY = {
     "Performance": "CHA", "Persuasion": "CHA", "Religion": "INT",
     "Sleight of Hand": "DEX", "Stealth": "DEX", "Survival": "WIS",
 }
-# This sheet has only 3 weapon/attack rows (the CPR sheet had 4); extra
-# weapons beyond the first 3 are omitted from the PDF (still present in the
-# parallel Markdown sheet SKILL.md Step 5 requires alongside the PDF).
-MAX_WEAPON_ROWS = 3
-WEAPON_ROW_FIELDS = [
-    ("Wpn Name", "Wpn1 AtkBonus", "Wpn1 Damage"),
-    ("Wpn Name 2", "Wpn2 AtkBonus ", "Wpn2 Damage "),
-    ("Wpn Name 3", "Wpn3 AtkBonus  ", "Wpn3 Damage "),
-]
+SKILL_DE = {
+    "Acrobatics": "Akrobatik", "Animal Handling": "Tierumgang", "Arcana": "Arkane Kunde",
+    "Athletics": "Athletik", "Deception": "Täuschung", "History": "Geschichte",
+    "Insight": "Menschenkenntnis", "Intimidation": "Einschüchtern",
+    "Investigation": "Nachforschung", "Medicine": "Heilkunde", "Nature": "Naturkunde",
+    "Perception": "Wahrnehmung", "Performance": "Auftreten", "Persuasion": "Überzeugen",
+    "Religion": "Religion", "Sleight of Hand": "Fingerfertigkeit", "Stealth": "Heimlichkeit",
+    "Survival": "Überlebenskunst",
+}
 
 
 def ability_modifier(score: int) -> int:
@@ -59,123 +75,125 @@ def _signed(n: int) -> str:
     return f"+{n}" if n >= 0 else str(n)
 
 
-def build_field_values(character: dict) -> dict[str, str]:
-    ability_scores = character["ability_scores"]
-    mods = {ab: ability_modifier(ability_scores[ab]) for ab in ABILITIES}
-    prof_bonus = character["proficiency_bonus"]
-
-    values: dict[str, str] = {
-        "CharacterName": character["name"],
-        "CharacterName 2": character["name"],
-        "ClassLevel": f"{character['class']} {character['level']}",
-        "Background": character["background"],
-        # 2024/SRD-5.2.1 characters have a "Species", not a "Race" — this
-        # sheet is the 2014-rules layout (see SKILL.md's known-limitations
-        # section), so the Species value is deliberately written into the
-        # sheet's own "Race " field (trailing space preserved verbatim).
-        "Race ": character["species"],
-        "Alignment": character.get("alignment", ""),
-        "ProfBonus": _signed(prof_bonus),
-        "AC": str(character["ac"]),
-        "Initiative": _signed(mods["DEX"]),
-        "Speed": str(character["speed"]),
-        "HPMax": str(character["hp"]["max"]),
-        "HPCurrent": str(character["hp"]["current"]),
-        "HPTemp": str(character["hp"]["temp"]),
-        # Best-effort: this sheet doesn't clearly separate "hit dice count"
-        # from "hit dice type" the way the schema does, so both fields get
-        # the same combined "<total><die>" notation (e.g. "1d10").
-        "HD": character["hit_dice"]["die"],
-        "HDTotal": character["hit_dice"]["die"],
-        "PersonalityTraits ": character.get("personality_traits", ""),
-        "Ideals": character.get("ideals", ""),
-        "Bonds": character.get("bonds", ""),
-        "Flaws": character.get("flaws", ""),
-        "Backstory": character.get("backstory", ""),
-        "Features and Traits": "\n".join(character.get("features_and_traits", [])),
-        "Equipment": "\n".join(character.get("equipment", [])),
-    }
-
-    for ability in ABILITIES:
-        values[ability] = str(ability_scores[ability])
-        values[ABILITY_MOD_FIELD[ability]] = _signed(mods[ability])
-
-    save_proficiencies = set(character.get("saving_throw_proficiencies", []))
-    for ability in ABILITIES:
-        total = mods[ability] + (prof_bonus if ability in save_proficiencies else 0)
-        values[SAVE_FIELD[ability]] = _signed(total)
-
-    skill_proficiencies = set(character.get("skill_proficiencies", []))
-    skill_expertise = set(character.get("skill_expertise", []))
-    for skill_name, level in SKILLS_FIELD_MAP.items():
-        governing_ability = SKILL_ABILITY[skill_name]
-        bonus = 0
-        if skill_name in skill_expertise:
-            bonus = prof_bonus * 2
-        elif skill_name in skill_proficiencies:
-            bonus = prof_bonus
-        total = mods[governing_ability] + bonus
-        values[level] = _signed(total)
-
-    perception_total = mods["WIS"] + (
-        prof_bonus * 2 if "Perception" in skill_expertise
-        else prof_bonus if "Perception" in skill_proficiencies
-        else 0
-    )
-    values["Passive"] = str(10 + perception_total)
-
-    coins = character.get("coins", {})
-    for denom in ("cp", "sp", "ep", "gp", "pp"):
-        if denom in coins:
-            values[denom.upper()] = str(coins[denom])
-
-    for (name_field, atk_field, dmg_field), weapon in zip(
-        WEAPON_ROW_FIELDS, character.get("weapons", [])[:MAX_WEAPON_ROWS]
-    ):
-        attack_mod = mods[weapon["attack_ability"]] + prof_bonus
-        weapon_name = weapon["name"]
-        extra = ", ".join(
-            part for part in (weapon.get("properties", ""), weapon.get("mastery", "")) if part
+def _portrait_data_uri(portrait_image_path: str | None) -> str | None:
+    if not portrait_image_path:
+        return None
+    path = Path(portrait_image_path)
+    suffix = path.suffix.lower()
+    mime = _PORTRAIT_MIME_TYPES.get(suffix)
+    if mime is None:
+        raise ValueError(f"unsupported portrait image type: {portrait_image_path!r}")
+    if not path.is_file():
+        raise ValueError(
+            f"portrait image not found at {portrait_image_path!r} — generate it "
+            "from the character's image-prompts/portrait-*.txt first, or set "
+            '"portrait_image_path": null to render this sheet without a portrait.'
         )
-        if extra:
-            weapon_name = f"{weapon_name} ({extra})"
-        values[name_field] = weapon_name
-        values[atk_field] = _signed(attack_mod)
-        values[dmg_field] = f"{weapon['damage_die']}{_signed(mods[weapon['attack_ability']])} {weapon['damage_type']}"
+    return data_uri(path, mime)
+
+
+def _theme_css_path(style_preset: str) -> Path:
+    theme_file = STYLE_PRESETS.get(style_preset)
+    if theme_file is None:
+        raise ValueError(
+            f"unknown style_preset {style_preset!r} — must be one of {sorted(STYLE_PRESETS)}"
+        )
+    return THEMES_DIR / theme_file
+
+
+def build_context(character: dict) -> dict:
+    """Derive every printed value (modifiers, save/skill totals, passive
+    perception, attack/damage, spell DC/attack) from the character's raw scores
+    and proficiency lists. The JSON supplies scores + proficiencies only."""
+    scores = character["ability_scores"]
+    mods = {ab: ability_modifier(scores[ab]) for ab in ABILITIES}
+    prof = character["proficiency_bonus"]
+
+    abilities = [
+        {"key": ab, "name_de": ABILITY_DE[ab], "score": scores[ab],
+         "mod": _signed(mods[ab])}
+        for ab in ABILITIES
+    ]
+
+    save_prof = set(character.get("saving_throw_proficiencies", []))
+    saves = [
+        {"key": ab, "name_de": ABILITY_DE[ab], "proficient": ab in save_prof,
+         "total": _signed(mods[ab] + (prof if ab in save_prof else 0))}
+        for ab in ABILITIES
+    ]
+
+    skill_prof = set(character.get("skill_proficiencies", []))
+    skill_exp = set(character.get("skill_expertise", []))
+    skills = []
+    for name in sorted(SKILL_ABILITY, key=lambda n: SKILL_DE[n]):
+        ab = SKILL_ABILITY[name]
+        bonus = prof * 2 if name in skill_exp else prof if name in skill_prof else 0
+        skills.append({
+            "name_de": SKILL_DE[name], "ability": ab,
+            "proficient": name in skill_prof, "expertise": name in skill_exp,
+            "total": _signed(mods[ab] + bonus),
+        })
+
+    perception_bonus = (
+        prof * 2 if "Perception" in skill_exp
+        else prof if "Perception" in skill_prof else 0
+    )
+    passive_perception = 10 + mods["WIS"] + perception_bonus
+
+    weapons = []
+    for w in character.get("weapons", []):
+        atk_ab = w["attack_ability"]
+        extra = ", ".join(p for p in (w.get("properties", ""), w.get("mastery", "")) if p)
+        weapons.append({
+            "name": w["name"],
+            "attack": _signed(mods[atk_ab] + prof),
+            "damage": f"{w['damage_die']}{_signed(mods[atk_ab])} {w['damage_type']}",
+            "properties": extra,
+        })
 
     spellcasting = character.get("spellcasting")
+    spells = None
     if spellcasting:
-        ability = spellcasting["ability"]
-        spell_dc = 8 + prof_bonus + mods[ability]
-        spell_atk = prof_bonus + mods[ability]
-        values["Spellcasting Class 2"] = character["class"]
-        values["SpellcastingAbility 2"] = ability
-        values["SpellSaveDC  2"] = str(spell_dc)
-        values["SpellAtkBonus 2"] = _signed(spell_atk)
+        ab = spellcasting["ability"]
+        spells = {
+            "ability": ab, "ability_de": ABILITY_DE[ab],
+            "save_dc": 8 + prof + mods[ab],
+            "attack": _signed(prof + mods[ab]),
+            "cantrips": spellcasting.get("cantrips", []),
+            "spells": spellcasting.get("spells_known_or_prepared", []),
+            "slots": spellcasting.get("spell_slots", {}),
+        }
 
-    return values
+    return {
+        "character": character,
+        "abilities": abilities,
+        "saves": saves,
+        "skills": skills,
+        "passive_perception": passive_perception,
+        "initiative": _signed(mods["DEX"]),
+        "proficiency_bonus": _signed(prof),
+        "weapons": weapons,
+        "spells": spells,
+        "coins": character.get("coins", {}),
+        "portrait_data_uri": _portrait_data_uri(character.get("portrait_image_path")),
+    }
+
+
+def render_character_sheet_html(character: dict) -> str:
+    """Render a character JSON dict into a self-contained HTML document string."""
+    theme_css_path = _theme_css_path(character.get("style_preset", DEFAULT_STYLE_PRESET))
+    context = build_context(character)
+    template = _ENV.get_template("character_sheet.html.jinja")
+    return template.render(
+        css=load_themed_css(ASSETS_DIR / "character_sheet.css", theme_css_path, ASSETS_DIR / "fonts"),
+        **context,
+    )
 
 
 def fill_character_sheet(character_json_path: Path, output_pdf: Path) -> None:
     character = json.loads(Path(character_json_path).read_text(encoding="utf-8"))
-    values = build_field_values(character)
-
-    # The portrait is stamped onto the blank sheet *before* the fields are
-    # filled, so filling is always the last step. pdftk's cat/stamp operations
-    # drop the AcroForm NeedAppearances flag that fill_text_fields sets, and
-    # without that flag renderers fall back to pdftk's own appearance streams,
-    # which silently drop umlauts from the printed page (see pdf_form.py).
-    with tempfile.TemporaryDirectory() as tmp:
-        source_pdf = BLANK_SHEET
-        portrait_path = character.get("portrait_image_path")
-        if portrait_path:
-            source_pdf = Path(tmp) / "with_portrait.pdf"
-            stamp_image_on_page(
-                BLANK_SHEET, source_pdf,
-                CHARACTER_IMAGE_PAGE, CHARACTER_IMAGE_PAGE_SIZE_PT, CHARACTER_IMAGE_RECT_PT,
-                Path(portrait_path),
-            )
-        fill_text_fields(source_pdf, output_pdf, values)
+    html = render_character_sheet_html(character)
+    render_html_to_pdf(html, output_pdf)
 
 
 def main() -> None:

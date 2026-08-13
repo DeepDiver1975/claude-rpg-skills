@@ -1,0 +1,50 @@
+{
+  "name": "Runa",
+  "species": "Mensch",
+  "class": "Magier",
+  "subclass": "Hervorrufer",
+  "level": 1,
+  "background": "Gelehrter",
+  "alignment": "Neutral Gut",
+  "ability_scores": {"STR": 8, "DEX": 14, "CON": 13, "INT": 16, "WIS": 12, "CHA": 10},
+  "proficiency_bonus": 2,
+  "hp": {"current": 7, "max": 7, "temp": 0},
+  "hit_dice": {"die": "1d6", "total": 1},
+  "ac": 12,
+  "speed": 30,
+  "saving_throw_proficiencies": ["INT", "WIS"],
+  "skill_proficiencies": ["Arcana", "Investigation"],
+  "skill_expertise": [],
+  "weapons": [
+    {"name": "Dolch", "attack_ability": "DEX", "damage_die": "1d4", "damage_type": "Stichschaden", "properties": "Fingerfertig, Leicht, Wurfwaffe", "mastery": "Kerbe"}
+  ],
+  "armor": {"name": "Keine", "ac_base": 12, "stealth_disadvantage": false},
+  "equipment": ["Zauberbuch", "Komponentenbeutel", "Gelehrtenausrüstung"],
+  "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 5, "pp": 0},
+  "features_and_traits": [
+    {"name": "Zaubern (Intelligenz)", "description": "Vollzauberer; bereitet täglich Zauber aus dem Zauberbuch vor. Zauber-SG und Zauberangriff basieren auf INT."},
+    {"name": "Arkane Wiederherstellung", "description": "Einmal pro Tag nach einer kurzen Rast Zauberplätze bis zum halben Magier-Grad (aufgerundet) zurückgewinnen."},
+    {"name": "Ritualzauberei", "description": "Ein Zauber mit Ritual-Merkmal kann ohne Zauberplatz gewirkt werden, wenn du 10 Minuten länger brauchst."},
+    {"name": "Hervorrufer (Unterklasse)", "description": "Spezialist für explosive Elementarmagie; ab Stufe 3 können Verbündete von deinen Hervorrufungszaubern ausgenommen werden."}
+  ],
+  "spellcasting": {
+    "ability": "INT",
+    "cantrips": [
+      {"name": "Feuerpfeil", "casting_time": "Aktion", "range": "36 m", "components": "V, G", "duration": "Unmittelbar", "effect": "Fernkampf-Zauberangriff; bei Treffer 1W10 Feuerschaden; entzündet ungehaltene brennbare Gegenstände."},
+      {"name": "Magierhand", "casting_time": "Aktion", "range": "9 m", "components": "V, G", "duration": "1 Minute", "effect": "Geisterhafte schwebende Hand; trägt/bewegt Gegenstände bis 5 kg, öffnet, verstaut (keine Angriffe)."},
+      {"name": "Einfache Illusion", "casting_time": "Aktion", "range": "9 m", "components": "G, M (Vlies)", "duration": "1 Minute", "effect": "Erschafft ein Geräusch oder das Abbild eines Gegenstands; eine Untersuchung-Probe (INT) enttarnt es."}
+    ],
+    "spells_known_or_prepared": [
+      {"name": "Magisches Geschoss", "casting_time": "Aktion", "range": "36 m", "components": "V, G", "duration": "Unmittelbar", "effect": "3 leuchtende Geschosse, je 1W4+1 Kraftschaden; treffen automatisch."},
+      {"name": "Schild", "casting_time": "Reaktion", "range": "Selbst", "components": "V, G", "duration": "1 Runde", "effect": "+5 RK bis zum Beginn deines nächsten Zuges, auch gegen Magisches Geschoss."},
+      {"name": "Magie entdecken", "casting_time": "Aktion oder Ritual", "range": "Selbst", "components": "V, G", "duration": "Konz., bis 10 Min", "effect": "Spürst Magie im Umkreis von 9 m; mit einer Aktion die Schule einer sichtbaren Aura erkennen."}
+    ],
+    "spell_slots": {"1": 2}
+  },
+  "personality_traits": "Notiert alles in einem abgegriffenen Feldbuch und stellt eine Frage zu viel.",
+  "ideals": "Wissen. Jedes Rätsel ist dazu da, gelöst zu werden.",
+  "bonds": "Sucht die verschollene Bibliothek, in der ihre Mentorin zuletzt gesehen wurde.",
+  "flaws": "Überschätzt regelmäßig, wie viel Zeit ein Zauber ihr verschafft.",
+  "backstory": "In der Gelehrtenstadt Weißfurt ausgebildet, brach Runa auf, um Magie im Feld statt nur in Büchern zu erproben.",
+  "portrait_image_path": null
+}

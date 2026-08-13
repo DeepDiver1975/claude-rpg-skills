@@ -1,183 +1,130 @@
 import json
-import subprocess
 from pathlib import Path
 
 import pytest
 
 from fill_character_sheet import (
+    STYLE_PRESETS,
     ability_modifier,
-    build_field_values,
+    build_context,
     fill_character_sheet,
+    render_character_sheet_html,
 )
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
-FIXTURE = SKILL_DIR / "scripts" / "fixtures" / "sample_character.json"
+FIGHTER = SKILL_DIR / "scripts" / "fixtures" / "sample_character.json"
+WIZARD = SKILL_DIR / "scripts" / "fixtures" / "sample_wizard.json"
 
 
-def _load_fixture() -> dict:
-    return json.loads(FIXTURE.read_text(encoding="utf-8"))
+def _load(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-@pytest.mark.parametrize(
-    "score,expected",
-    [(1, -5), (8, -1), (9, -1), (10, 0), (11, 0), (13, 1), (16, 3), (20, 5)],
-)
-def test_ability_modifier(score, expected):
-    assert ability_modifier(score) == expected
+def test_ability_modifier_rounds_down():
+    assert ability_modifier(16) == 3
+    assert ability_modifier(8) == -1
+    assert ability_modifier(10) == 0
+    assert ability_modifier(13) == 1
 
 
-def test_build_field_values_static_fields():
-    values = build_field_values(_load_fixture())
-    assert values["CharacterName"] == "Rurik"
-    assert values["ClassLevel"] == "Fighter 1"
-    assert values["Background"] == "Soldier"
-    assert values["Race "] == "Dwarf"
-    assert values["AC"] == "16"
-    assert values["Speed"] == "30"
-    assert values["HPMax"] == "13"
+def test_build_context_computes_saves_skills_passive_initiative():
+    ctx = build_context(_load(FIGHTER))
+    saves = {s["key"]: s for s in ctx["saves"]}
+    assert saves["STR"]["total"] == "+5" and saves["STR"]["proficient"]  # +3 mod +2 prof
+    assert saves["CON"]["total"] == "+4"
+    assert saves["DEX"]["total"] == "+1" and not saves["DEX"]["proficient"]
+
+    skills = {s["name_de"]: s for s in ctx["skills"]}
+    assert skills["Athletik"]["total"] == "+5" and skills["Athletik"]["proficient"]  # STR
+    assert skills["Wahrnehmung"]["total"] == "+1"  # WIS 13 -> +1, unproficient
+
+    assert ctx["passive_perception"] == 11  # 10 + WIS(+1) + 0
+    assert ctx["initiative"] == "+1"
 
 
-def test_build_field_values_ability_scores_and_mods():
-    values = build_field_values(_load_fixture())
-    # STR 16 -> mod +3
-    assert values["STR"] == "16"
-    assert values["STRmod"] == "+3"
-    # CHA 8 -> mod -1 (sheet's own typo field name "CHamod", not "CHAmod")
-    assert values["CHA"] == "8"
-    assert values["CHamod"] == "-1"
-    # DEX 12 -> mod +1
-    assert values["DEXmod "] == "+1"
+def test_expertise_doubles_proficiency_bonus():
+    character = _load(FIGHTER)
+    character["skill_expertise"] = ["Athletics"]
+    skills = {s["name_de"]: s for s in build_context(character)["skills"]}
+    assert skills["Athletik"]["total"] == "+7"  # STR +3 + 2*prof(2)
+    assert skills["Athletik"]["expertise"]
 
 
-def test_build_field_values_initiative_uses_dex_mod():
-    values = build_field_values(_load_fixture())
-    assert values["Initiative"] == "+1"
+def test_caster_spell_dc_and_attack_are_computed():
+    ctx = build_context(_load(WIZARD))
+    assert ctx["spells"]["save_dc"] == 13  # 8 + prof 2 + INT 3
+    assert ctx["spells"]["attack"] == "+5"
+    assert any(s["name"] == "Magisches Geschoss" for s in ctx["spells"]["spells"])
 
 
-def test_build_field_values_saving_throws():
-    values = build_field_values(_load_fixture())
-    # STR save: proficient, mod +3, PB +2 -> +5
-    assert values["ST Strength"] == "+5"
-    # CON save: proficient, mod +2, PB +2 -> +4
-    assert values["ST Constitution"] == "+4"
-    # DEX save: not proficient, mod +1 only -> +1
-    assert values["ST Dexterity"] == "+1"
+def test_spell_effects_are_rendered_on_the_sheet():
+    # One-shot sheets must show each spell's effect, not just its name.
+    html = render_character_sheet_html(_load(WIZARD))
+    assert "Magisches Geschoss" in html
+    assert "treffen automatisch" in html  # the effect text
 
 
-def test_build_field_values_skills():
-    values = build_field_values(_load_fixture())
-    # Athletics (STR, proficient): +3 mod + 2 PB = +5
-    assert values["Athletics"] == "+5"
-    # Intimidation (CHA, proficient): -1 mod + 2 PB = +1
-    assert values["Intimidation"] == "+1"
-    # Acrobatics (DEX, not proficient): +1 mod only
-    assert values["Acrobatics"] == "+1"
+def test_spell_card_shows_meta_fields():
+    # Full spell card: casting time / range / components / duration on the sheet.
+    html = render_character_sheet_html(_load(WIZARD))
+    assert "36 m" in html and "V, G" in html and "Unmittelbar" in html
 
 
-def test_build_field_values_passive_perception():
-    values = build_field_values(_load_fixture())
-    # WIS 13 -> mod +1, not proficient in Perception -> 10 + 1 = 11
-    assert values["Passive"] == "11"
+def test_feature_shows_full_description():
+    # Features/traits render name + full German description.
+    html = render_character_sheet_html(_load(FIGHTER))
+    assert "Zweiter Wind" in html
+    assert "Kämpfer-Grad Trefferpunkte" in html  # the description text
 
 
-def test_build_field_values_weapon_row():
-    values = build_field_values(_load_fixture())
-    assert values["Wpn Name"] == "Longsword (Versatile (1d10), Sap)"
-    # STR mod +3, PB +2 -> +5
-    assert values["Wpn1 AtkBonus"] == "+5"
-    assert values["Wpn1 Damage"] == "1d8+3 slashing"
+def test_bare_string_spell_and_feature_still_render():
+    # Backward compatibility: a plain string (no card fields) still shows.
+    character = _load(WIZARD)
+    character["features_and_traits"] = ["Nur ein Name"]
+    character["spellcasting"]["cantrips"] = ["Feuerpfeil"]
+    html = render_character_sheet_html(character)
+    assert "Nur ein Name" in html and "Feuerpfeil" in html
 
 
-def test_build_field_values_no_spellcasting_fields_for_non_caster():
-    values = build_field_values(_load_fixture())
-    assert "Spellcasting Class 2" not in values
+def test_non_caster_has_no_spell_section():
+    fighter_html = render_character_sheet_html(_load(FIGHTER))
+    wizard_html = render_character_sheet_html(_load(WIZARD))
+    assert '<div class="section-label">Zauber</div>' not in fighter_html
+    assert '<div class="section-label">Zauber</div>' in wizard_html
 
 
-def test_build_field_values_spellcasting_fields_for_caster():
-    character = _load_fixture()
-    character["spellcasting"] = {
-        "ability": "INT", "cantrips": ["Fire Bolt"],
-        "spells_known_or_prepared": ["Magic Missile"], "spell_slots": {"1": 2},
-    }
-    character["ability_scores"]["INT"] = 16
-    character["proficiency_bonus"] = 2
-    values = build_field_values(character)
-    # INT 16 -> mod +3; DC = 8 + 2 + 3 = 13; attack bonus = 2 + 3 = +5
-    assert values["Spellcasting Class 2"] == "Fighter"
-    assert values["SpellcastingAbility 2"] == "INT"
-    assert values["SpellSaveDC  2"] == "13"
-    assert values["SpellAtkBonus 2"] == "+5"
+def test_html_uses_german_labels():
+    html = render_character_sheet_html(_load(FIGHTER))
+    for label in ("Attribute", "Kampfwerte", "Rettungswürfe", "Fertigkeiten"):
+        assert label in html
+    assert "Athletik" in html and "Stärke" in html  # German skill/ability names
 
 
-def _dump_field_value(pdf_path: Path, field_name: str) -> str:
-    result = subprocess.run(
-        ["pdftk", str(pdf_path), "dump_data_fields_utf8"],
-        check=True, capture_output=True, text=True,
-    )
-    lines = result.stdout.splitlines()
-    for i, line in enumerate(lines):
-        if line == f"FieldName: {field_name}":
-            for follow in lines[i:i + 6]:
-                if follow.startswith("FieldValue:"):
-                    return follow.split(":", 1)[1].strip()
-    raise AssertionError(f"field {field_name!r} not found or has no value")
+def test_default_style_preset_is_classic_phb():
+    html = render_character_sheet_html(_load(FIGHTER))
+    assert "--accent: #7a1f1f;" in html  # classic-phb palette token
 
 
-def test_fill_character_sheet_end_to_end(tmp_path):
-    output_pdf = tmp_path / "rurik.pdf"
-    fill_character_sheet(FIXTURE, output_pdf)
-    assert output_pdf.exists()
-    assert _dump_field_value(output_pdf, "CharacterName") == "Rurik"
-    assert _dump_field_value(output_pdf, "STRmod") == "+3"
-
-    dump = subprocess.run(
-        ["pdftk", str(output_pdf), "dump_data"], check=True, capture_output=True, text=True,
-    ).stdout
-    assert "NumberOfPages: 3" in dump
+def test_unknown_style_preset_raises():
+    character = _load(FIGHTER)
+    character["style_preset"] = "vaporwave"
+    with pytest.raises(ValueError, match="vaporwave"):
+        render_character_sheet_html(character)
 
 
-def test_fill_character_sheet_renders_german_backstory_with_umlauts(tmp_path):
-    output_pdf = tmp_path / "rurik.pdf"
-    fill_character_sheet(FIXTURE, output_pdf)
-    txt_path = tmp_path / "page2.txt"
-    subprocess.run(
-        ["mutool", "draw", "-F", "txt", "-o", str(txt_path), str(output_pdf), "2"],
-        check=True, capture_output=True,
-    )
-    rendered = txt_path.read_text(encoding="utf-8", errors="replace")
-    assert "Österreich" in rendered, f"umlaut missing from rendered page: {rendered!r}"
+def test_missing_portrait_file_raises_actionable_error(tmp_path):
+    character = _load(FIGHTER)
+    character["portrait_image_path"] = str(tmp_path / "not-generated-yet.png")
+    with pytest.raises(ValueError, match="portrait"):
+        render_character_sheet_html(character)
 
 
-def test_fill_character_sheet_stamps_portrait(tmp_path):
-    portrait = tmp_path / "portrait.png"
-    subprocess.run(["magick", "-size", "400x400", "xc:#3355ff", str(portrait)], check=True, capture_output=True)
-
-    character = _load_fixture()
-    character["portrait_image_path"] = str(portrait)
-    character_json = tmp_path / "character.json"
-    character_json.write_text(json.dumps(character), encoding="utf-8")
-
-    output_pdf = tmp_path / "rurik.pdf"
-    fill_character_sheet(character_json, output_pdf)
-
-    png_path = tmp_path / "rendered.png"
-    subprocess.run(
-        ["mutool", "draw", "-o", str(png_path), "-r", "100", str(output_pdf), "2"],
-        check=True, capture_output=True,
-    )
-    result = subprocess.run(
-        ["magick", str(png_path), "-format", "%[pixel:p{150,300}]", "info:"],
-        check=True, capture_output=True, text=True,
-    )
-    pixel = result.stdout.strip()
-    assert "51,85,255" in pixel or "3355FF".lower() in pixel.lower()
-
-
-def test_build_field_values_raises_nothing_for_missing_optional_fields():
-    # A character with no weapons/coins/features should still build without error.
-    character = _load_fixture()
-    character["weapons"] = []
-    character["coins"] = {}
-    character["features_and_traits"] = []
-    values = build_field_values(character)
-    assert values["Equipment"] == "\n".join(character["equipment"])
+@pytest.mark.parametrize("preset", sorted(STYLE_PRESETS))
+def test_every_style_preset_composes_and_renders(tmp_path, preset):
+    character = _load(WIZARD)
+    character["style_preset"] = preset
+    character_json = tmp_path / "c.json"
+    character_json.write_text(json.dumps(character, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / f"{preset}.pdf"
+    fill_character_sheet(character_json, out)
+    assert out.exists() and out.stat().st_size > 0

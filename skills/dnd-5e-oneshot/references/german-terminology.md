@@ -375,3 +375,42 @@ verified here — fetch it from `data/raw/spells.txt` (if you've run the
 extraction) or the official PDF directly before using it, the same
 gap-reporting discipline `spellcasting-summary.md` already calls for on the
 English side.
+
+## Character-sheet labels
+
+The section headers and field labels the HTML character sheet
+(`assets/character_sheet.html.jinja`) prints. These are the standard official
+German SRD 5.2.1 rules terms; where a run wants to re-verify them, they appear
+in the German SRD's rules-glossary/character-creation sections (`extract_srd_de.py`
+sections `playing-the-game` / `character-creation`). Any that can't be confirmed
+against the PDF should be flagged as a Step-10 gap, not invented.
+
+| English | German (sheet label) |
+|---|---|
+| Ability Scores | Attribute |
+| Saving Throws | Rettungswürfe |
+| Skills | Fertigkeiten |
+| Armor Class | Rüstungsklasse |
+| Hit Points | Trefferpunkte |
+| Hit Dice | Trefferwürfel |
+| Initiative | Initiative |
+| Speed | Bewegungsrate |
+| Proficiency Bonus | Übungsbonus |
+| Passive Perception | Passive Wahrnehmung |
+| Attacks | Angriffe |
+| Weapon / Attack / Damage / Properties | Waffe / Angriff / Schaden / Eigenschaften |
+| Spells | Zauber |
+| Spellcasting Ability | Zauberfähigkeit |
+| Spell Save DC | Zauber-SG |
+| Spell Attack Bonus | Zauberangriff |
+| Spell Slots | Zauberplätze |
+| Cantrips | Zaubertricks |
+| Casting Time (spell card) | Zeitaufwand |
+| Range (spell card) | Reichweite |
+| Components (spell card) | Komponenten (V/G/M) |
+| Duration (spell card) | Wirkungsdauer |
+| Equipment & Coins | Ausrüstung & Münzen |
+| Features & Traits | Merkmale & Eigenschaften |
+| Alignment | Gesinnung |
+| Level | Stufe |
+| Coin abbreviations (cp/sp/ep/gp/pp) | KM / SM / EM / GM / PM |
