@@ -54,7 +54,36 @@ def test_caster_spell_dc_and_attack_are_computed():
     ctx = build_context(_load(WIZARD))
     assert ctx["spells"]["save_dc"] == 13  # 8 + prof 2 + INT 3
     assert ctx["spells"]["attack"] == "+5"
-    assert "Magisches Geschoss" in ctx["spells"]["spells"]
+    assert any(s["name"] == "Magisches Geschoss" for s in ctx["spells"]["spells"])
+
+
+def test_spell_effects_are_rendered_on_the_sheet():
+    # One-shot sheets must show each spell's effect, not just its name.
+    html = render_character_sheet_html(_load(WIZARD))
+    assert "Magisches Geschoss" in html
+    assert "treffen automatisch" in html  # the effect text
+
+
+def test_spell_card_shows_meta_fields():
+    # Full spell card: casting time / range / components / duration on the sheet.
+    html = render_character_sheet_html(_load(WIZARD))
+    assert "36 m" in html and "V, G" in html and "Unmittelbar" in html
+
+
+def test_feature_shows_full_description():
+    # Features/traits render name + full German description.
+    html = render_character_sheet_html(_load(FIGHTER))
+    assert "Zweiter Wind" in html
+    assert "Kämpfer-Grad Trefferpunkte" in html  # the description text
+
+
+def test_bare_string_spell_and_feature_still_render():
+    # Backward compatibility: a plain string (no card fields) still shows.
+    character = _load(WIZARD)
+    character["features_and_traits"] = ["Nur ein Name"]
+    character["spellcasting"]["cantrips"] = ["Feuerpfeil"]
+    html = render_character_sheet_html(character)
+    assert "Nur ein Name" in html and "Feuerpfeil" in html
 
 
 def test_non_caster_has_no_spell_section():

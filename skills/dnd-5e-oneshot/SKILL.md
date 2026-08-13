@@ -194,7 +194,7 @@ below shows all of this together:
   "armor": {"name": "Kettenrüstung", "ac_base": 16, "stealth_disadvantage": true},
   "equipment": ["Schild", "Entdeckerausrüstung"],
   "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 10, "pp": 0},
-  "features_and_traits": ["Zweiter Atem (1×/Rast, heilt 1d10 + Stufe)"],
+  "features_and_traits": [{"name": "Zweiter Wind", "description": "Bonusaktion (1/Rast): heile 1W10 + Kämpfer-Grad TP zurück."}],
   "spellcasting": null,
   "personality_traits": "string",
   "ideals": "string",
@@ -209,8 +209,29 @@ below shows all of this together:
 `references/spellcasting-summary.md`):
 
 ```json
-{"ability": "INT", "cantrips": ["Feuerpfeil", "Magierhand"], "spells_known_or_prepared": ["Magisches Geschoss", "Schild"], "spell_slots": {"1": 2}}
+{
+  "ability": "INT",
+  "cantrips": [{"name": "Feuerpfeil", "casting_time": "Aktion", "range": "36 m", "components": "V, G", "duration": "Unmittelbar", "effect": "Fernkampf-Zauberangriff; bei Treffer 1W10 Feuerschaden."}],
+  "spells_known_or_prepared": [{"name": "Magisches Geschoss", "casting_time": "Aktion", "range": "36 m", "components": "V, G", "duration": "Unmittelbar", "effect": "3 leuchtende Geschosse, je 1W4+1 Kraftschaden; treffen automatisch."}],
+  "spell_slots": {"1": 2}
+}
 ```
+
+Because these sheets are for one-shots (often with new players), each cantrip and
+spell is a **full card**: `name` + `casting_time` (Zeitaufwand) + `range`
+(Reichweite) + `components` (Komponenten, V/G/M) + `duration` (Wirkungsdauer) +
+`effect` — so a player can run the spell from the sheet alone. Source all of it
+from the German SRD spell block (`references/spellcasting-summary.md` for the
+name; the full stat line + effect from the German SRD `data/raw/spells.txt` after
+the `extract_srd_de.py` extraction, or the PDF) — use the SRD's exact German
+values (component codes **V**=verbal, **G**=gestisch, **M**=material), condensing
+only the effect prose. Every field except `name` is optional; a bare string still
+renders name-only.
+
+`features_and_traits[]` items are `{name, description}` objects — the description
+a full German sentence from `references/classes-and-subclasses.md` (e.g.
+`{"name": "Zweiter Wind", "description": "Bonusaktion (begrenzte Nutzungen je
+Rast): heile 1W10 + Kämpfer-Grad TP zurück."}`). A bare string renders name-only.
 
 Spell names should be the German term from `references/spellcasting-
 summary.md`'s curated shortlist (sourced from the official German SRD PDF,

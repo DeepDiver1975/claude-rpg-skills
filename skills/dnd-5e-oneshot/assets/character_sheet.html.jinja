@@ -100,11 +100,27 @@
       <div class="chip corner-frame"><span class="chip-label">Plätze Grad {{ lvl }}</span><span class="chip-value mono">{{ n }}</span></div>
       {% endfor %}
     </div>
+    {% macro spell_cards(items) %}
+      {% for s in items %}
+      <div class="spell-card">
+        {% if s is mapping %}
+        <div class="spell-head"><span class="spell-name">{{ s.name }}</span>{% set meta = [s.casting_time, s.range, s.components, s.duration] | select | list %}{% if meta %}<span class="spell-meta">{{ meta | join(' · ') }}</span>{% endif %}</div>
+        {% if s.effect %}<div class="spell-effect">{{ s.effect }}</div>{% endif %}
+        {% else %}<span class="spell-name">{{ s }}</span>{% endif %}
+      </div>
+      {% endfor %}
+    {% endmacro %}
     {% if spells.cantrips %}
-    <div class="spell-line"><span class="spell-line-label">Zaubertricks</span><span>{{ spells.cantrips | join(' · ') }}</span></div>
+    <div class="spell-block">
+      <div class="spell-block-label">Zaubertricks</div>
+      {{ spell_cards(spells.cantrips) }}
+    </div>
     {% endif %}
     {% if spells.spells %}
-    <div class="spell-line"><span class="spell-line-label">Zauber (Grad 1)</span><span>{{ spells.spells | join(' · ') }}</span></div>
+    <div class="spell-block">
+      <div class="spell-block-label">Zauber (Grad 1)</div>
+      {{ spell_cards(spells.spells) }}
+    </div>
     {% endif %}
   </section>
   {% endif %}
@@ -116,19 +132,22 @@
       {% for item in character.equipment %}<li>{{ item }}</li>{% endfor %}
     </ul>
     {% endif %}
-    <div class="coins mono">
-      {% for denom, label in [('pp','PM'),('gp','GM'),('ep','EM'),('sp','SM'),('cp','KM')] %}
-      {% if coins.get(denom) %}<span class="coin">{{ coins[denom] }} {{ label }}</span>{% endif %}
-      {% endfor %}
+    {% if coins.values() | select | list %}
+    <div class="coin-line">
+      <span class="coin-line-label">Münzen</span>
+      <span class="coins mono">
+        {% for denom, label in [('pp','PM'),('gp','GM'),('ep','EM'),('sp','SM'),('cp','KM')] %}{% if coins.get(denom) %}<span class="coin">{{ coins[denom] }} {{ label }}</span>{% endif %}{% endfor %}
+      </span>
     </div>
+    {% endif %}
   </section>
 
   {% if character.features_and_traits %}
   <section class="features">
     <div class="section-label">Merkmale &amp; Eigenschaften</div>
-    <ul class="feature-list">
-      {% for f in character.features_and_traits %}<li>{{ f }}</li>{% endfor %}
-    </ul>
+    {% for f in character.features_and_traits %}
+    <div class="feature-card">{% if f is mapping %}<span class="feature-name">{{ f.name }}</span>{% if f.description %} — {{ f.description }}{% endif %}{% else %}<span class="feature-name">{{ f }}</span>{% endif %}</div>
+    {% endfor %}
   </section>
   {% endif %}
 

@@ -405,6 +405,10 @@ against the PDF should be flagged as a Step-10 gap, not invented.
 | Spell Attack Bonus | Zauberangriff |
 | Spell Slots | Zauberplätze |
 | Cantrips | Zaubertricks |
+| Casting Time (spell card) | Zeitaufwand |
+| Range (spell card) | Reichweite |
+| Components (spell card) | Komponenten (V/G/M) |
+| Duration (spell card) | Wirkungsdauer |
 | Equipment & Coins | Ausrüstung & Münzen |
 | Features & Traits | Merkmale & Eigenschaften |
 | Alignment | Gesinnung |

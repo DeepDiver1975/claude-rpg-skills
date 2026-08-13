@@ -43,6 +43,9 @@ body {
   color: var(--ink);
   background: var(--paper);
   margin: 0;
+  /* Small inset so edge elements' corner-frame brackets (which sit 1.5pt
+     outside their box) stay on the paper rather than poking into the margin. */
+  padding: 0 4pt;
 }
 h1 { margin: 0; }
 
@@ -113,7 +116,10 @@ tr { break-inside: avoid; }
 }
 
 /* Abilities */
-.ability-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6pt; }
+/* minmax(0, 1fr), not 1fr: a plain 1fr is minmax(auto, 1fr), so a long
+   uppercase ability name (min-content) can push a track — and the whole grid —
+   past the page's content box, spilling boxes past the paper background. */
+.ability-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6pt; }
 .ability-box {
   padding: 5pt 3pt;
   text-align: center;
@@ -131,7 +137,7 @@ tr { break-inside: avoid; }
 .chip-value { display: block; font-weight: 700; font-size: 13pt; margin-top: 2pt; }
 
 /* Saves + Skills share the dotted-row idiom */
-.save-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2pt 14pt; }
+.save-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2pt 14pt; }
 .save-row, .skill-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -154,14 +160,28 @@ table { width: 100%; border-collapse: collapse; font-size: 10pt; }
 th, td { text-align: left; padding: 3.5pt 6pt; border-bottom: 0.5pt solid var(--hairline); }
 th { font-family: var(--font-display); text-transform: uppercase; font-size: 8pt; color: var(--muted); letter-spacing: 0.03em; font-weight: 400; }
 
-/* Spell free-text lines */
-.spell-line { display: flex; gap: 10pt; margin-top: 6pt; padding: 3pt 2pt; border-bottom: 0.5pt solid var(--hairline); font-size: 10pt; }
-.spell-line-label { flex-shrink: 0; min-width: 72pt; font-family: var(--font-display); font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); padding-top: 1pt; }
+/* Spells — a full card per cantrip / level-1 spell: name, a meta line
+   (Zeitaufwand · Reichweite · Komponenten · Wirkungsdauer), then the effect, so
+   a one-shot player can run the spell from the sheet alone. Each card avoids
+   breaking across a page; cards may break between each other. */
+.spell-block { margin-top: 6pt; }
+.spell-block-label { font-family: var(--font-display); font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); margin-bottom: 2pt; }
+.spell-card { break-inside: avoid; margin: 3.5pt 0; }
+.spell-head { display: flex; align-items: baseline; gap: 8pt; flex-wrap: wrap; }
+.spell-name { font-weight: 700; color: var(--accent-2); }
+.spell-meta { font-family: var(--font-mono); font-size: 7.5pt; color: var(--muted); }
+.spell-effect { font-size: 9.5pt; margin-top: 0.5pt; }
 
-/* Gear / coins / features */
-.gear-list, .feature-list { margin: 0; padding-left: 16pt; }
-.gear-list li, .feature-list li { margin: 1pt 0; }
-.coins { margin-top: 7pt; display: flex; gap: 14pt; }
+/* Features & traits — name + full description card. */
+.feature-card { break-inside: avoid; margin: 3pt 0; font-size: 9.5pt; }
+.feature-name { font-weight: 700; color: var(--accent-2); }
+
+/* Gear / coins */
+.gear-list { margin: 0; padding-left: 16pt; }
+.gear-list li { margin: 1pt 0; }
+.coin-line { display: flex; gap: 10pt; align-items: baseline; margin-top: 8pt; }
+.coin-line-label { flex-shrink: 0; font-family: var(--font-display); font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.coins { display: flex; gap: 12pt; }
 .coin { font-weight: 700; }
 
 /* Free text */

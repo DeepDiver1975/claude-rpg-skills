@@ -21,7 +21,13 @@
   "armor": {"name": "Kettenpanzer", "ac_base": 16, "stealth_disadvantage": true},
   "equipment": ["Schild", "6 Wurfspeere", "Entdeckerausrüstung"],
   "coins": {"cp": 0, "sp": 0, "ep": 0, "gp": 9, "pp": 0},
-  "features_and_traits": ["Kampfstil: Verteidigung (+1 RK in Rüstung)", "Zweiter Wind (Bonusaktion, 1/Rast, heilt 1W10+1)", "Waffenmeisterschaft: Langschwert (Schwächen), Wurfspeer (Verlangsamen)", "Zwergische Widerstandskraft, Zwergische Zähigkeit, Steinkunde"],
+  "features_and_traits": [
+    {"name": "Kampfstil: Verteidigung", "description": "+1 auf die Rüstungsklasse, solange du eine Rüstung trägst."},
+    {"name": "Zweiter Wind", "description": "Bonusaktion (begrenzte Nutzungen je Rast): heile 1W10 + Kämpfer-Grad Trefferpunkte zurück."},
+    {"name": "Waffenmeisterschaft", "description": "Langschwert – Schwächen: das Ziel hat Nachteil auf seinen nächsten Angriffswurf. Wurfspeer – Verlangsamen: Bewegungsrate des Ziels −3 m."},
+    {"name": "Champion (Unterklasse)", "description": "Strebt nach körperlicher Vollkommenheit im Kampf; Unterklassenmerkmale (u. a. verbesserter kritischer Treffer) folgen ab Stufe 3."},
+    {"name": "Zwergische Merkmale", "description": "Zwergische Widerstandskraft (Vorteil gegen Gift, Resistenz gegen Giftschaden), Zwergische Zähigkeit (+1 TP je Stufe) und Steinkunde."}
+  ],
   "spellcasting": null,
   "personality_traits": "Ruhig und bedächtig, bis jemand seine Familie beleidigt – dann wird er laut.",
   "ideals": "Ehre. Ein gegebenes Wort ist ein gegebenes Wort.",
