@@ -1,10 +1,10 @@
 # Pinned to the versions verified to render the character/mook sheets
 # correctly (CSS @page sizing, @font-face embedding, object-fit portrait
 # cropping) — see assets/character_sheet.css and assets/mook_sheet.css.
-weasyprint==69.0
+weasyprint==70.0
 jinja2==3.1.6
 
 # Test-only, used by scripts/test_*.py to read back generated PDFs/build
 # synthetic portrait fixtures. Not required to run the skill itself.
-pypdf==6.16.1
+pypdf==6.18.0
 pillow==12.3.0
